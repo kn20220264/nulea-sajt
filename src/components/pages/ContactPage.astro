@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/i18n.js';
+import { getSiteSettings } from '../../lib/queries.js';
+
+const { lang } = Astro.props;
+const settings = await getSiteSettings();
+const telHref = `tel:${settings.sosNumber.replace(/\s+/g, '')}`;
+---
+
+<BaseLayout lang={lang} title={t(lang, 'contact_page_title')} description={t(lang, 'contact_page_lead')}>
+  <div class="page-head">
+    <div class="wrap">
+      <div class="eyebrow" data-reveal>{t(lang, 'contact_page_title')}</div>
+      <h1>{lang === 'me' ? 'Javite nam se' : 'Get in touch'}</h1>
+      <p>{t(lang, 'contact_page_lead')}</p>
+    </div>
+  </div>
+
+  <section class="sec">
+    <div class="wrap contact-grid">
+      <div>
+        <div class="contact-block">
+          <h3>{t(lang, 'sos_label')}</h3>
+          <a href={telHref}>{settings.sosNumber}</a>
+          <small>{settings.sosNote[lang]}</small>
+        </div>
+        <div class="contact-block">
+          <h3>{lang === 'me' ? 'E-pošta' : 'Email'}</h3>
+          <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          <small>{lang === 'me' ? 'Odgovaramo u toku radnih dana.' : 'We reply on working days.'}</small>
+        </div>
+        <div class="callout">
+          <b>{lang === 'me' ? 'Adresa nije javna' : 'Our address is not public'}</b>
+          <p>{settings.emergencyNote[lang]}</p>
+        </div>
+      </div>
+      <div>
+        <h2 style="margin-bottom:24px">{lang === 'me' ? 'Pošaljite poruku' : 'Send a message'}</h2>
+        <form id="contact-form" data-email={settings.email} data-subject={t(lang, 'form_mailto_subject')}>
+          <div class="form-field">
+            <label for="ime">{t(lang, 'form_name')} ({lang === 'me' ? 'nije obavezno' : 'optional'})</label>
+            <input type="text" id="ime" name="ime" autocomplete="name" />
+          </div>
+          <div class="form-field">
+            <label for="mail">{lang === 'me' ? 'E-pošta ili telefon' : 'Email or phone'}</label>
+            <input type="text" id="mail" name="mail" autocomplete="email" />
+          </div>
+          <div class="form-field">
+            <label for="poruka">{t(lang, 'form_message')}</label>
+            <textarea id="poruka" name="poruka" required></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">{t(lang, 'form_submit')}</button>
+          <p class="form-note">{t(lang, 'form_note')}</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('contact-form');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = form.getAttribute('data-email');
+    const subject = form.getAttribute('data-subject');
+    const name = form.querySelector('#ime').value.trim();
+    const contact = form.querySelector('#mail').value.trim();
+    const message = form.querySelector('#poruka').value.trim();
+
+    const bodyLines = [];
+    if (name) bodyLines.push(`${name}`);
+    if (contact) bodyLines.push(`${contact}`);
+    bodyLines.push('');
+    bodyLines.push(message);
+
+    const mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+    window.location.href = mailto;
+  });
+</script>

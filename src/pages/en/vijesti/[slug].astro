@@ -1,0 +1,13 @@
+---
+import NewsDetailPage from '../../../components/pages/NewsDetailPage.astro';
+import { getAllNewsSlugs } from '../../../lib/queries.js';
+
+export async function getStaticPaths() {
+  const slugs = await getAllNewsSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+---
+
+<NewsDetailPage lang="en" slug={slug} />

@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/i18n.js';
+
+const { lang } = Astro.props;
+const description =
+  lang === 'me'
+    ? 'O nevladinom udruženju Lea Bar — misija, vrijednosti, partneri i donatori.'
+    : "About the Lea Bar association — mission, values, partners and donors.";
+---
+
+<BaseLayout lang={lang} title={t(lang, 'about_page_title')} description={description}>
+  <div class="page-head">
+    <div class="wrap" data-reveal>
+      <div class="eyebrow">{t(lang, 'about_page_title')}</div>
+      <h1>{lang === 'me' ? 'Nevladino udruženje Lea Bar' : 'Lea Bar Non-Governmental Association'}</h1>
+      <p>
+        {lang === 'me'
+          ? 'Organizacija iz Bara koja radi na prevenciji nasilja i osnaživanju žena i djevojaka.'
+          : 'An organisation from Bar working on violence prevention and the empowerment of women and girls.'}
+      </p>
+    </div>
+  </div>
+
+  <section class="sec">
+    <div class="wrap two-col">
+      <div>
+        <p>
+          {lang === 'me'
+            ? 'Nevladino udruženje Lea Bar djeluje u Baru, Crna Gora, sa fokusom na prevenciju nasilja, osnaživanje djevojaka i podršku roditeljima. U okviru rada vodimo i sklonište za žene i djecu žrtve nasilja.'
+            : 'The Lea Bar association operates in Bar, Montenegro, focusing on violence prevention, empowering girls and supporting parents. As part of our work, we also run a shelter for women and children who are victims of violence.'}
+        </p>
+        <p>
+          {lang === 'me'
+            ? 'Naš rad obuhvata direktnu podršku ženama i djeci, edukaciju djevojaka kroz vršnjačke programe i saradnju sa školama, institucijama i drugim organizacijama u regionu.'
+            : 'Our work includes direct support for women and children, education of girls through peer programmes, and cooperation with schools, institutions and other organisations in the region.'}
+        </p>
+      </div>
+      <div class="values">
+        <div class="value">
+          <b>{lang === 'me' ? 'Povjerljivost' : 'Confidentiality'}</b>
+          <span>
+            {lang === 'me'
+              ? 'Lokacija naših prostorija nije javna i nikada se ne objavljuje.'
+              : 'The location of our premises is not public and is never published.'}
+          </span>
+        </div>
+        <div class="value">
+          <b>{lang === 'me' ? 'Bez osuđivanja' : 'No judgement'}</b>
+          <span>{lang === 'me' ? 'Ne tražimo objašnjenja i ne postavljamo uslove.' : 'We ask for no explanations and set no conditions.'}</span>
+        </div>
+        <div class="value">
+          <b>{lang === 'me' ? 'Odluka je vaša' : 'The decision is yours'}</b>
+          <span>{lang === 'me' ? 'Pomažemo, ali ne odlučujemo umjesto vas.' : 'We help, but we do not decide for you.'}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec-dark">
+    <div class="wrap">
+      <div class="sec-head"><h2>{lang === 'me' ? 'Sa kim sarađujemo' : 'Who we work with'}</h2></div>
+      <div class="two-col">
+        <p>
+          {lang === 'me'
+            ? 'Projekte sprovodimo u partnerstvu sa organizacijama iz regiona, uz podršku Evropske unije, lokalne samouprave i drugih donatora.'
+            : 'We implement projects in partnership with organisations from the region, with support from the European Union, local government and other donors.'}
+        </p>
+        <p>
+          {lang === 'me'
+            ? 'Spisak partnera i donatora po projektu možete vidjeti na pojedinačnim stranicama projekata.'
+            : 'A list of partners and donors per project is available on the individual project pages.'}
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectRow from '../ProjectRow.astro';
+import { t } from '../../lib/i18n.js';
+import { getActiveProjects, getArchivedProjects } from '../../lib/queries.js';
+
+const { lang } = Astro.props;
+const [active, archived] = await Promise.all([getActiveProjects(), getArchivedProjects()]);
+---
+
+<BaseLayout lang={lang} title={t(lang, 'projects_page_title')} description={t(lang, 'projects_page_lead')}>
+  <div class="page-head">
+    <div class="wrap" data-reveal>
+      <h1>{t(lang, 'projects_page_title')}</h1>
+      <p>{t(lang, 'projects_page_lead')}</p>
+    </div>
+  </div>
+
+  <section class="sec">
+    <div class="wrap">
+      {active.length > 0 ? (
+        <div class="proj-list">
+          {active.map((project, i) => <ProjectRow lang={lang} project={project} index={i} />)}
+        </div>
+      ) : (
+        <p class="empty-note">{t(lang, 'no_projects_yet')}</p>
+      )}
+    </div>
+  </section>
+
+  <section class="sec sec-alt">
+    <div class="wrap">
+      <div class="sec-head" data-reveal><h2>{t(lang, 'archive_heading')}</h2></div>
+      {archived.length > 0 ? (
+        <div class="proj-list">
+          {archived.map((project, i) => <ProjectRow lang={lang} project={project} index={i} />)}
+        </div>
+      ) : (
+        <p class="empty-note">{t(lang, 'no_archive_yet')}</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

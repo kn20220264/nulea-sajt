@@ -1,0 +1,32 @@
+---
+import { t, localizePath } from '../lib/i18n.js';
+
+const { lang, email, sosNumber } = Astro.props;
+const telHref = `tel:${sosNumber.replace(/\s+/g, '')}`;
+---
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">NU Lea Bar</div>
+        <p class="foot-note">{t(lang, 'address_note')}</p>
+      </div>
+      <div>
+        <h4>{t(lang, 'footer_contact_heading')}</h4>
+        <a href={telHref}>{sosNumber}</a>
+        <a href={`mailto:${email}`}>{email}</a>
+      </div>
+      <div>
+        <h4>{t(lang, 'footer_org_heading')}</h4>
+        <a href={localizePath('/o-nama/', lang)}>{t(lang, 'nav_about')}</a>
+        <a href={localizePath('/projekti/', lang)}>{t(lang, 'nav_projects')}</a>
+        <a href={localizePath('/vijesti/', lang)}>{t(lang, 'nav_news')}</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; {new Date().getFullYear()} NU Lea Bar</span>
+      <span>{t(lang, 'emergency_footer_note')}</span>
+    </div>
+  </div>
+</footer>

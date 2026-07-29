@@ -1,0 +1,51 @@
+---
+import { PortableText } from 'astro-portabletext';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, categoryLabel, formatDate, localizePath } from '../../lib/i18n.js';
+import { getNewsBySlug } from '../../lib/queries.js';
+import { urlFor } from '../../lib/sanity.js';
+
+const { lang, slug } = Astro.props;
+const news = await getNewsBySlug(slug);
+
+if (!news) {
+  throw new Error(`News not found for slug: ${slug}`);
+}
+
+const coverUrl = news.coverImage?.asset
+  ? urlFor(news.coverImage.asset).width(1400).height(700).fit('crop').auto('format').url()
+  : null;
+---
+
+<BaseLayout lang={lang} title={news.title[lang]} description={news.excerpt[lang]}>
+  <div class="article-head">
+    <div class="wrap">
+      <a href={localizePath('/vijesti/', lang)}>{t(lang, 'back_to_news')}</a>
+      <div class="meta" style="margin-top:22px">
+        <span class="cat">{categoryLabel(lang, news.category)}</span>
+        <span class="date">{formatDate(lang, news.publishedAt)}</span>
+      </div>
+      <h1>{news.title[lang]}</h1>
+      {coverUrl && (
+        <div class="article-cover">
+          <img src={coverUrl} alt={news.coverImage.alt || ''} />
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="wrap">
+    <article class="article-body">
+      <PortableText value={news.body?.[lang]} />
+
+      {news.relatedProject && (
+        <p>
+          <strong>{t(lang, 'related_project')}:</strong>{' '}
+          <a href={localizePath(`/projekti/${news.relatedProject.slug}/`, lang)}>
+            {news.relatedProject.title[lang]}
+          </a>
+        </p>
+      )}
+    </article>
+  </div>
+</BaseLayout>

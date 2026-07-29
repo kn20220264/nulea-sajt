@@ -1,0 +1,25 @@
+---
+import { t, statusLabel, localizePath } from '../lib/i18n.js';
+
+const { lang, project, index = 0 } = Astro.props;
+const href = localizePath(`/projekti/${project.slug}/`, lang);
+
+function year(dateStr) {
+  return dateStr ? new Date(dateStr).getFullYear() : '';
+}
+const period = project.endDate
+  ? `${year(project.startDate)} — ${year(project.endDate)}`
+  : `${year(project.startDate)}`;
+---
+
+<a class="proj" href={href} data-reveal style={`--reveal-delay:${index * 90}ms`}>
+  <span class={`chip ${project.status}`}>{statusLabel(lang, project.status)}</span>
+  <div>
+    <h3>{project.title[lang]}</h3>
+    <p>{project.summary[lang]}</p>
+  </div>
+  <div class="proj-meta">
+    <b>{period}</b>
+    {t(lang, 'donor_label')}: {project.donor[lang]}
+  </div>
+</a>

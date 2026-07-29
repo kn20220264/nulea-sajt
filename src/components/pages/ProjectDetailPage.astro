@@ -1,0 +1,72 @@
+---
+import { PortableText } from 'astro-portabletext';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, statusLabel, localizePath } from '../../lib/i18n.js';
+import { getProjectBySlug } from '../../lib/queries.js';
+import { urlFor } from '../../lib/sanity.js';
+
+const { lang, slug } = Astro.props;
+const project = await getProjectBySlug(slug);
+
+if (!project) {
+  throw new Error(`Project not found for slug: ${slug}`);
+}
+
+const coverUrl = project.coverImage?.asset
+  ? urlFor(project.coverImage.asset).width(1400).height(700).fit('crop').auto('format').url()
+  : null;
+
+function year(dateStr) {
+  return dateStr ? new Date(dateStr).getFullYear() : '';
+}
+const period = project.endDate ? `${year(project.startDate)} — ${year(project.endDate)}` : `${year(project.startDate)}`;
+---
+
+<BaseLayout lang={lang} title={project.title[lang]} description={project.summary[lang]}>
+  <div class="article-head">
+    <div class="wrap">
+      <a href={localizePath('/projekti/', lang)}>{t(lang, 'back_to_projects')}</a>
+      <div class="meta" style="margin-top:22px">
+        <span class={`chip ${project.status}`}>{statusLabel(lang, project.status)}</span>
+        <span class="date">{period}</span>
+      </div>
+      <h1>{project.title[lang]}</h1>
+      <p class="lead" style="margin-top:16px">
+        {t(lang, 'donor_label')}: {project.donor[lang]}
+      </p>
+      {coverUrl && (
+        <div class="article-cover">
+          <img src={coverUrl} alt={project.coverImage.alt || ''} />
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="wrap">
+    <article class="article-body">
+      <PortableText value={project.body?.[lang]} />
+
+      {project.gallery && project.gallery.length > 0 && (
+        <div>
+          <h2>{t(lang, 'gallery_heading')}</h2>
+          <div class="gallery-grid">
+            {project.gallery.map((img) => (
+              <img src={urlFor(img.asset).width(500).height(500).fit('crop').auto('format').url()} alt={img.alt || ''} loading="lazy" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {project.documents && project.documents.length > 0 && (
+        <div>
+          <h2>{t(lang, 'documents_heading')}</h2>
+          <ul class="doc-list">
+            {project.documents.map((doc) => (
+              <li><a href={doc.asset.url} target="_blank" rel="noopener">{doc.asset.originalFilename}</a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </article>
+  </div>
+</BaseLayout>

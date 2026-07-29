@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, localizePath } from '../../lib/i18n.js';
+
+const { lang } = Astro.props;
+---
+
+<BaseLayout lang={lang} title={t(lang, 'not_found_title')} description={t(lang, 'not_found_body')}>
+  <div class="not-found wrap">
+    <h1>{t(lang, 'not_found_title')}</h1>
+    <p>{t(lang, 'not_found_body')}</p>
+    <p style="margin-top:24px"><a class="btn btn-primary" href={localizePath('/', lang)}>{t(lang, 'back_home')}</a></p>
+  </div>
+</BaseLayout>

@@ -1,0 +1,51 @@
+---
+import { t, localizePath } from '../lib/i18n.js';
+
+const { lang } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { key: 'nav_home', path: '/' },
+  { key: 'nav_news', path: '/vijesti/' },
+  { key: 'nav_projects', path: '/projekti/' },
+  { key: 'nav_about', path: '/o-nama/' },
+  { key: 'nav_contact', path: '/kontakt/' },
+];
+
+function isCurrent(path) {
+  const target = localizePath(path, lang);
+  return currentPath === target;
+}
+---
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href={localizePath('/', lang)}>
+      <img src="/assets/logo.png" alt="NU Lea Bar" />
+      <span>{t(lang, 'orgType')}</span>
+    </a>
+    <nav class="site-nav" id="nav">
+      {navItems.map((item) => (
+        <a href={localizePath(item.path, lang)} aria-current={isCurrent(item.path) ? 'page' : undefined}>
+          {t(lang, item.key)}
+        </a>
+      ))}
+    </nav>
+    <div class="head-right">
+      <div class="lang">
+        <a href={localizePath(currentPath, 'me')} aria-current={lang === 'me' ? 'true' : undefined} hreflang="me">CG</a>
+        <a href={localizePath(currentPath, 'en')} aria-current={lang === 'en' ? 'true' : undefined} hreflang="en">EN</a>
+      </div>
+      <button class="burger" type="button" id="burger" aria-label={t(lang, 'menu_label')} aria-expanded="false" aria-controls="nav">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('nav');
+  burger?.addEventListener('click', () => {
+    const open = nav?.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+</script>

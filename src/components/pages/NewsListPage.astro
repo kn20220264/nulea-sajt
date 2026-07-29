@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsCard from '../NewsCard.astro';
+import { t } from '../../lib/i18n.js';
+import { getAllNews } from '../../lib/queries.js';
+
+const { lang } = Astro.props;
+const news = await getAllNews();
+---
+
+<BaseLayout lang={lang} title={t(lang, 'news_page_title')} description={t(lang, 'news_page_lead')}>
+  <div class="page-head">
+    <div class="wrap" data-reveal>
+      <h1>{t(lang, 'news_page_title')}</h1>
+      <p>{t(lang, 'news_page_lead')}</p>
+    </div>
+  </div>
+  <section class="sec">
+    <div class="wrap">
+      {news.length > 0 ? (
+        <div class="news-grid three">
+          {news.map((item, i) => <NewsCard lang={lang} news={item} index={i} />)}
+        </div>
+      ) : (
+        <p class="empty-note">{t(lang, 'no_news_yet')}</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
