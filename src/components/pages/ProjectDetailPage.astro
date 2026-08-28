@@ -19,7 +19,7 @@ const coverUrl = project.coverImage?.asset
 function year(dateStr) {
   return dateStr ? new Date(dateStr).getFullYear() : '';
 }
-const period = project.endDate ? `${year(project.startDate)} — ${year(project.endDate)}` : `${year(project.startDate)}`;
+const period = project.endDate ? `${year(project.startDate)}-${year(project.endDate)}` : `${year(project.startDate)}`;
 ---
 
 <BaseLayout lang={lang} title={project.title[lang]} description={project.summary[lang]}>

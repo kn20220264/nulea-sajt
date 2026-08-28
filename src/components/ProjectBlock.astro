@@ -1,0 +1,26 @@
+---
+import { t, localizePath } from '../lib/i18n.js';
+import { urlFor } from '../lib/sanity.js';
+
+const { lang, project, index = 0 } = Astro.props;
+const href = localizePath(`/projekti/${project.slug}/`, lang);
+const allProjectsHref = localizePath('/projekti/', lang);
+const imgUrl = project.coverImage?.asset
+  ? urlFor(project.coverImage.asset).width(900).height(600).fit('crop').auto('format').url()
+  : null;
+const alt = project.coverImage?.alt || '';
+---
+
+<div class="pblock" style={`--reveal-delay:${index * 90}ms`} data-reveal>
+  <h3>{project.title[lang]}</h3>
+  <p>{project.summary[lang]}</p>
+
+  {imgUrl && (
+    <div class="pblock-img">
+      <img src={imgUrl} alt={alt} loading="lazy" />
+    </div>
+  )}
+
+  <a class="pblock-more" href={href}>{t(lang, 'learn_more')}</a>
+  <a class="pblock-btn" href={allProjectsHref}>{t(lang, 'projects_cta')}</a>
+</div>

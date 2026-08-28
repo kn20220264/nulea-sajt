@@ -5,16 +5,22 @@ export const HTML_LANG = { me: 'sr-ME', en: 'en' };
 
 const UI = {
   orgType: { me: 'Nevladino udruženje', en: 'Non-governmental association' },
-  nav_home: { me: 'Naslovna', en: 'Home' },
-  nav_news: { me: 'Vijesti', en: 'News' },
+  brand_home_label: { me: 'NU Lea Bar - naslovna', en: 'NU Lea Bar - home' },
+  nav_news: { me: 'Novosti', en: 'News' },
   nav_projects: { me: 'Projekti', en: 'Projects' },
-  nav_about: { me: 'O nama', en: 'About us' },
+  nav_publications: { me: 'Publikacije', en: 'Publications' },
+  nav_reports: { me: 'Izvještaji', en: 'Reports' },
+  nav_about: { me: 'O nama', en: 'About' },
+  nav_our_work: { me: 'Naš rad', en: 'Our Work' },
+  nav_resources: { me: 'Resursi', en: 'Resources' },
   nav_contact: { me: 'Kontakt', en: 'Contact' },
+  nav_donate: { me: 'Donacije', en: 'Donations' },
   menu_label: { me: 'Meni', en: 'Menu' },
   skip_to_content: { me: 'Preskoči na sadržaj', en: 'Skip to content' },
 
-  sos_label: { me: 'SOS telefon — 24h', en: 'SOS line — 24h' },
+  sos_label: { me: 'SOS telefon - 24h', en: 'SOS line - 24h' },
   quick_exit: { me: 'Brzi izlaz', en: 'Quick exit' },
+  safety_band_heading: { me: 'Ako vam je potrebna pomoć', en: 'If you need help' },
 
   privacy_notice: {
     me: 'Posjeta ovom sajtu ostaje zabilježena u istoriji vašeg pretraživača. Ako niste sigurne da je uređaj bezbjedan, koristite privatni prozor (Ctrl+Shift+N) ili pritisnite Esc za brzi izlaz.',
@@ -22,10 +28,19 @@ const UI = {
   },
 
   all_news: { me: 'Sve vijesti →', en: 'All news →' },
+  read_more: { me: 'Pročitaj više', en: 'Read more' },
+  load_more_news: { me: 'Prikaži još vijesti', en: 'Show more news' },
+  learn_more: { me: 'Saznaj više →', en: 'Learn more →' },
+  projects_cta: { me: 'Projekti →', en: 'Projects →' },
   all_projects: { me: 'Svi projekti →', en: 'All projects →' },
   news_heading: { me: 'Novosti', en: 'News' },
   current_projects_heading: { me: 'Aktuelni projekti', en: 'Current projects' },
-  what_we_do: { me: 'Čime se bavimo', en: 'What we do' },
+  projects_heading: { me: 'Projekti', en: 'Projects' },
+  projects_intro: {
+    me: 'Projekte sprovodimo samostalno i u saradnji sa partnerskim organizacijama, odgovarajući na stvarne potrebe žena i djevojaka u našoj zajednici. Svaki naš projekat polazi od istog pitanja: šta je ženama i djevojkama potrebno da žive sigurnije, slobodnije i ravnopravnije?',
+    en: 'We run our projects independently and in collaboration with partner organisations, responding to the real needs of women and girls in our community. Every project starts from the same question: what do women and girls need to live safer, freer and more equal lives?',
+  },
+  what_we_do: { me: 'Kako nastaje promjena', en: 'How change happens' },
 
   news_page_title: { me: 'Vijesti', en: 'News' },
   news_page_lead: {
@@ -37,12 +52,35 @@ const UI = {
     me: 'Programi koje trenutno vodimo i oni koje smo završili.',
     en: 'Programmes we currently run, and those we have completed.',
   },
-  archive_heading: { me: 'Arhiva — završeni projekti', en: 'Archive — completed projects' },
+  publications_page_title: { me: 'Publikacije', en: 'Publications' },
+  publications_page_lead: {
+    me: 'U nastavku možete da preuzmete publikacije i izvještaje udruženja.',
+    en: 'Download the publications and reports of the association below.',
+  },
+  no_publications_yet: { me: 'Publikacije uskoro stižu.', en: 'Publications coming soon.' },
+  download_publication: { me: 'Preuzmi publikaciju', en: 'Download publication' },
+
+  reports_page_title: { me: 'Izvještaji', en: 'Reports' },
+  reports_eyebrow: { me: 'Transparentnost', en: 'Transparency' },
+  reports_page_lead: {
+    me: 'Godišnji i finansijski izvještaji o radu udruženja, dostupni za preuzimanje.',
+    en: 'Annual and financial reports on our work, available for download.',
+  },
+  no_reports_yet: {
+    me: 'Izvještaji će biti objavljeni ovdje čim budu dostupni.',
+    en: 'Reports will be published here as soon as they are available.',
+  },
+  report_coming_soon: { me: 'Uskoro', en: 'Coming soon' },
+  download_report: { me: 'Preuzmi izvještaj', en: 'Download report' },
+
+  projects_filter_label: { me: 'Status', en: 'Status' },
+  projects_filter_all: { me: 'Svi', en: 'All' },
+  projects_filter_ongoing: { me: 'U toku', en: 'Ongoing' },
+  projects_filter_completed: { me: 'Završeni', en: 'Completed' },
 
   photo_placeholder: { me: 'Fotografija', en: 'Photograph' },
   no_news_yet: { me: 'Vijesti uskoro stižu.', en: 'News coming soon.' },
   no_projects_yet: { me: 'Projekti uskoro stižu.', en: 'Projects coming soon.' },
-  no_archive_yet: { me: 'Arhiva je za sada prazna.', en: 'The archive is currently empty.' },
 
   back_to_news: { me: '← Sve vijesti', en: '← All news' },
   back_to_projects: { me: '← Svi projekti', en: '← All projects' },
@@ -55,30 +93,20 @@ const UI = {
   about_page_title: { me: 'O nama', en: 'About us' },
   contact_page_title: { me: 'Kontakt', en: 'Contact' },
   contact_page_lead: {
-    me: 'Javite nam se telefonom, e-poštom ili preko forme. Adresa naših prostorija nije javna iz sigurnosnih razloga.',
-    en: 'Reach us by phone, email or through the form below. For safety reasons, the address of our premises is not public.',
+    me: 'Anonimno, sigurno i besplatno.',
+    en: 'Anonymous, safe and free of charge.',
   },
 
   address_note: {
     me: 'Iz sigurnosnih razloga adresa naših prostorija nije javna. Kontakt ostvarujete telefonom ili e-poštom.',
     en: 'For safety reasons, the address of our premises is not public. Please contact us by phone or email.',
   },
-  emergency_footer_note: {
-    me: 'U slučaju neposredne opasnosti pozovite 122.',
-    en: 'In case of immediate danger, call 122.',
-  },
   footer_org_heading: { me: 'Organizacija', en: 'Organisation' },
   footer_contact_heading: { me: 'Kontakt', en: 'Contact' },
-
-  form_name: { me: 'Ime', en: 'Name' },
-  form_email: { me: 'E-pošta', en: 'Email' },
-  form_message: { me: 'Poruka', en: 'Message' },
-  form_submit: { me: 'Pošalji e-poštom', en: 'Send by email' },
-  form_note: {
-    me: 'Dugme otvara vaš e-mail program sa već popunjenom porukom — poruka ide direktno na našu e-poštu, ne prolazi kroz naš sajt niti se čuva na serveru. Ne bilježimo vašu IP adresu ni podatke o uređaju.',
-    en: 'This button opens your email app with the message pre-filled — it goes straight to our inbox and never passes through or is stored on our site. We do not record your IP address or device information.',
-  },
-  form_mailto_subject: { me: 'Poruka sa sajta', en: 'Message from the website' },
+  footer_donations_heading: { me: 'Donacije', en: 'Donations' },
+  donation_account_label: { me: 'Žiro račun za donacije', en: 'Donation account' },
+  made_by_prefix: { me: 'Napravljeno sa', en: 'Made with' },
+  made_by_suffix: { me: 'od', en: 'by' },
 
   not_found_title: { me: 'Stranica nije pronađena', en: 'Page not found' },
   not_found_body: {
@@ -86,6 +114,9 @@ const UI = {
     en: 'The page you are looking for does not exist or has moved.',
   },
   back_home: { me: '← Naslovna', en: '← Home' },
+
+  prev_news: { me: 'Prethodna vijest', en: 'Previous story' },
+  next_news: { me: 'Sljedeća vijest', en: 'Next story' },
 };
 
 export function t(lang, key) {
@@ -100,7 +131,19 @@ export const CATEGORY_LABELS = {
   predavanje: { me: 'Predavanje', en: 'Lecture' },
   saopstenje: { me: 'Saopštenje', en: 'Statement' },
   izvjestaj: { me: 'Izvještaj', en: 'Report' },
+  projekat: { me: 'Projekat', en: 'Project' },
+  konferencija: { me: 'Konferencija', en: 'Conference' },
+  akcija: { me: 'Akcija', en: 'Campaign' },
 };
+
+export const REPORT_TYPE_LABELS = {
+  'godisnji-izvjestaj': { me: 'Godišnji izvještaj', en: 'Annual report' },
+  'finansijski-izvjestaj': { me: 'Finansijski izvještaj', en: 'Financial report' },
+};
+
+export function reportTypeLabel(lang, type) {
+  return REPORT_TYPE_LABELS[type]?.[lang] ?? type;
+}
 
 export const STATUS_LABELS = {
   active: { me: 'U toku', en: 'Ongoing' },
@@ -126,11 +169,18 @@ export function formatDate(lang, isoDate) {
   }).format(date);
 }
 
+/** Rute čiji se slug razlikuje po jeziku (CG putanja → EN putanja). */
+const EN_PATH_ALIASES = { '/izvjestaji/': '/reports/' };
+
 /** Prefixes a root-relative path with /en for the English site, or strips it for me. */
 export function localizePath(path, lang) {
   const clean = path.replace(/^\/en\//, '/').replace(/^\/en$/, '/');
   if (lang === 'en') {
-    return clean === '/' ? '/en/' : `/en${clean}`;
+    const mapped = EN_PATH_ALIASES[clean] ?? clean;
+    return mapped === '/' ? '/en/' : `/en${mapped}`;
+  }
+  for (const [mePath, enPath] of Object.entries(EN_PATH_ALIASES)) {
+    if (clean === enPath) return mePath;
   }
   return clean;
 }

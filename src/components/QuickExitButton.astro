@@ -1,0 +1,28 @@
+---
+import { t } from '../lib/i18n.js';
+
+const { lang, quickExitUrl } = Astro.props;
+---
+
+<button class="quick-exit-fab" type="button" data-quick-exit={quickExitUrl}>
+  <span>{t(lang, 'quick_exit')}</span> <kbd>Esc</kbd>
+</button>
+
+<script>
+  function quickExit(url) {
+    const target = url || 'https://www.google.com';
+    window.open(target, '_blank', 'noopener');
+    window.location.replace(target);
+  }
+
+  document.querySelectorAll('[data-quick-exit]').forEach((btn) => {
+    btn.addEventListener('click', () => quickExit(btn.getAttribute('data-quick-exit')));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const btn = document.querySelector('[data-quick-exit]');
+      quickExit(btn?.getAttribute('data-quick-exit'));
+    }
+  });
+</script>

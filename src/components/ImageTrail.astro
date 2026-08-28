@@ -1,0 +1,113 @@
+---
+/*
+  Trag slika koji prati kursor (port React Bits <ImageTrail/>, variant 1,
+  bez React-a i bez gsap-a — Web Animations API).
+  Sloj pokriva roditeljsku sekciju (roditelj mora biti position:relative);
+  pointer-events:none, pa ništa ispod ne gubi klikove.
+  Radi sa mišem i dodirom; neaktivno uz "prefers-reduced-motion".
+*/
+const { images = [] } = Astro.props;
+---
+
+<div class="img-trail" data-image-trail aria-hidden="true">
+  {images.map((src) => (
+    <div class="img-trail-item">
+      <div class="img-trail-inner" style={`background-image:url('${src}')`}></div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .img-trail{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:6}
+  .img-trail-item{
+    position:absolute;top:0;left:0;opacity:0;overflow:hidden;
+    width:clamp(120px,15vw,190px);aspect-ratio:1.1;border-radius:var(--r-card);
+    box-shadow:0 14px 34px rgba(63,36,64,.22);
+    will-change:transform,opacity;
+  }
+  .img-trail-inner{
+    position:absolute;top:-10px;left:-10px;
+    width:calc(100% + 20px);height:calc(100% + 20px);
+    background-size:cover;background-position:50% 50%;
+  }
+</style>
+
+<script>
+  /* gsap power1.out i power3.out ekvivalenti */
+  const EASE_MOVE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  const EASE_FADE = 'cubic-bezier(0.215, 0.61, 0.355, 1)';
+  const THRESHOLD = 80;
+
+  const enabled = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  if (enabled) {
+    document.querySelectorAll<HTMLElement>('[data-image-trail]').forEach((layer) => {
+      const zone = layer.parentElement;
+      const items = Array.from(layer.querySelectorAll<HTMLElement>('.img-trail-item'));
+      if (!zone || items.length === 0) return;
+
+      let pos = 0;
+      let zVal = 1;
+      let raf = 0;
+      const mouse = { x: 0, y: 0 };
+      const last = { x: 0, y: 0 };
+      const cache = { x: 0, y: 0 };
+      const anims = new WeakMap<HTMLElement, Animation>();
+
+      function show() {
+        zVal++;
+        pos = (pos + 1) % items.length;
+        const el = items[pos];
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        anims.get(el)?.cancel();
+        el.style.zIndex = String(zVal);
+        const anim = el.animate(
+          [
+            { transform: `translate(${cache.x - w / 2}px, ${cache.y - h / 2}px) scale(1)`, opacity: 1, easing: EASE_MOVE },
+            { transform: `translate(${mouse.x - w / 2}px, ${mouse.y - h / 2}px) scale(1)`, opacity: 1, offset: 0.5, easing: EASE_FADE },
+            { transform: `translate(${mouse.x - w / 2}px, ${mouse.y - h / 2}px) scale(0.2)`, opacity: 0 },
+          ],
+          { duration: 800, fill: 'forwards' }
+        );
+        /* cancel vraća na bazno opacity:0 — bez curenja "forwards" fill-ova */
+        anim.onfinish = () => anim.cancel();
+        anims.set(el, anim);
+      }
+
+      function tick() {
+        cache.x += (mouse.x - cache.x) * 0.1;
+        cache.y += (mouse.y - cache.y) * 0.1;
+        if (Math.hypot(mouse.x - last.x, mouse.y - last.y) > THRESHOLD) {
+          show();
+          last.x = mouse.x;
+          last.y = mouse.y;
+        }
+        raf = requestAnimationFrame(tick);
+      }
+
+      function onMove(clientX: number, clientY: number) {
+        const r = layer.getBoundingClientRect();
+        mouse.x = clientX - r.left;
+        mouse.y = clientY - r.top;
+        if (!raf) {
+          cache.x = mouse.x;
+          cache.y = mouse.y;
+          last.x = mouse.x;
+          last.y = mouse.y;
+          raf = requestAnimationFrame(tick);
+        }
+      }
+
+      zone.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY), { passive: true });
+      zone.addEventListener(
+        'touchmove',
+        (e) => {
+          const t = e.touches[0];
+          if (t) onMove(t.clientX, t.clientY);
+        },
+        { passive: true }
+      );
+    });
+  }
+</script>

@@ -1,0 +1,29 @@
+---
+/**
+ * Dekorativne "rukom crtane" linije oko hero fotografije na stranici O nama.
+ * Dva odvojena sloja: -back ide IZA fotografije, -front preko nje —
+ * zajedno daju utisak da se linija provlači kroz kadar.
+ */
+---
+
+<div class="ab-squiggle ab-squiggle-back" aria-hidden="true">
+  <svg viewBox="0 0 600 700" fill="none" preserveAspectRatio="xMidYMid meet" focusable="false" aria-hidden="true">
+    <path
+      d="M310 18 C 160 80, 430 150, 285 225 C 140 300, 430 340, 300 415"
+      stroke="var(--c-magenta)" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke"
+    />
+    <path
+      d="M470 150 C 610 230, 620 370, 460 440"
+      stroke="var(--c-magenta)" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke"
+    />
+  </svg>
+</div>
+
+<div class="ab-squiggle ab-squiggle-front" aria-hidden="true">
+  <svg viewBox="0 0 700 300" fill="none" preserveAspectRatio="xMidYMid meet" focusable="false" aria-hidden="true">
+    <path
+      d="M30 210 C 150 60, 560 30, 645 130 C 700 200, 430 285, 215 245 C 115 226, 85 185, 130 130"
+      stroke="var(--c-magenta)" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke"
+    />
+  </svg>
+</div>

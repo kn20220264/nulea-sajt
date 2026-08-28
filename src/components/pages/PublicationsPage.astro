@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/i18n.js';
+import { getAllPublications } from '../../lib/queries.js';
+import { urlFor } from '../../lib/sanity.js';
+
+const { lang } = Astro.props;
+const publications = await getAllPublications();
+
+function shortDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+}
+---
+
+<BaseLayout
+  lang={lang}
+  title={t(lang, 'publications_page_title')}
+  description={t(lang, 'publications_page_lead')}
+>
+  <div class="page-head">
+    <div class="wrap page-head-row" data-reveal>
+      <div>
+        <h1>{t(lang, 'publications_page_title')}</h1>
+        <span class="page-head-kicker" aria-hidden="true"></span>
+      </div>
+      <p class="page-head-lead">{t(lang, 'publications_page_lead')}</p>
+    </div>
+  </div>
+
+  <section class="sec">
+    <div class="wrap">
+      {publications.length > 0 ? (
+        <div class="pub-list">
+          {publications.map((pub, i) => {
+            const fileUrl = lang === 'en' ? (pub.pdfUrlEn ?? pub.pdfUrlMe) : pub.pdfUrlMe;
+            const fileName =
+              lang === 'en' ? (pub.pdfFileNameEn ?? pub.pdfFileNameMe) : pub.pdfFileNameMe;
+            const Tag = fileUrl ? 'a' : 'div';
+            const imgSrc = pub.coverImage?.asset
+              ? urlFor(pub.coverImage).width(480).height(300).fit('crop').auto('format').url()
+              : null;
+            const imgAlt = pub.coverImage?.alt || pub.title?.[lang] || '';
+            return (
+              <Tag
+                class="pub-row"
+                href={fileUrl ? `${fileUrl}?dl=${encodeURIComponent(fileName ?? '')}` : undefined}
+                target={fileUrl ? '_blank' : undefined}
+                rel={fileUrl ? 'noopener' : undefined}
+                aria-label={fileUrl ? `${t(lang, 'download_publication')}: ${pub.title?.[lang]}` : undefined}
+                data-reveal
+                style={`--reveal-delay:${(i % 3) * 90}ms`}
+              >
+                <span class="pub-date">{shortDate(pub.date)}</span>
+                <div class="pub-thumb">
+                  {imgSrc ? (
+                    <img src={imgSrc} alt={imgAlt} loading="lazy" width="480" height="300" />
+                  ) : (
+                    <div class="pub-thumb-fallback" aria-hidden="true">
+                      <img src="/assets/nulea-logo.svg" alt="" loading="lazy" />
+                    </div>
+                  )}
+                </div>
+                <h3 class="pub-title">{pub.title?.[lang]}</h3>
+                <p class="pub-desc">{pub.description?.[lang]}</p>
+                <span class="pub-arrow" aria-hidden="true">→</span>
+              </Tag>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="empty-note">{t(lang, 'no_publications_yet')}</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

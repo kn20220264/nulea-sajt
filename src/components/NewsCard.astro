@@ -4,17 +4,20 @@ import { urlFor } from '../lib/sanity.js';
 
 const { lang, news, index = 0 } = Astro.props;
 const href = localizePath(`/vijesti/${news.slug}/`, lang);
-const imgUrl = news.coverImage?.asset ? urlFor(news.coverImage.asset).width(640).height(400).fit('crop').auto('format').url() : null;
+const imgUrl = news.coverImage?.asset ? urlFor(news.coverImage.asset).width(640).height(480).fit('crop').auto('format').url() : null;
 ---
 
 <a class="card" href={href} data-reveal style={`--reveal-delay:${index * 90}ms`}>
   <div class="card-img">
     {imgUrl ? <img src={imgUrl} alt={news.coverImage.alt || ''} loading="lazy" /> : t(lang, 'photo_placeholder')}
   </div>
-  <div class="meta">
-    <span class="cat">{categoryLabel(lang, news.category)}</span>
-    <span class="date">{formatDate(lang, news.publishedAt)}</span>
+  <div class="card-body">
+    <div class="card-top">
+      <span class="cat">{categoryLabel(lang, news.category)}</span>
+      <h3>{news.title[lang]}</h3>
+      <span class="date">{formatDate(lang, news.publishedAt)}</span>
+      <p>{news.excerpt[lang]}</p>
+    </div>
+    <span class="card-link">{t(lang, 'read_more')} <span class="arrow">→</span></span>
   </div>
-  <h3>{news.title[lang]}</h3>
-  <p>{news.excerpt[lang]}</p>
 </a>

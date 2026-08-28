@@ -1,77 +1,424 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { t } from '../../lib/i18n.js';
+import { PortableText } from 'astro-portabletext';
+import { t, localizePath } from '../../lib/i18n.js';
+import { getAboutPage } from '../../lib/queries.js';
+import { urlFor } from '../../lib/sanity.js';
 
 const { lang } = Astro.props;
+const about = (await getAboutPage()) ?? {};
+
+/** Lokalizovano CMS polje sa fallback-om na tekst u kodu. */
+const L = (field, fallback) => field?.[lang] ?? fallback;
+const imgUrl = (img, w) => (img?.asset ? urlFor(img).width(w).url() : null);
+const imgAlt = (img, fallback = '') =>
+  (lang === 'me' ? img?.altMe : img?.altEn) ?? img?.altMe ?? fallback;
+
 const description =
   lang === 'me'
-    ? 'O nevladinom udruženju Lea Bar — misija, vrijednosti, partneri i donatori.'
-    : "About the Lea Bar association — mission, values, partners and donors.";
+    ? 'O nevladinom udruženju Lea Bar - misija, vizija, vrijednosti i način rada.'
+    : 'About the Lea Bar association - mission, vision, values and how we work.';
+
+const cutoutOne = imgUrl(about.cutoutImageOne, 640) ?? '/assets/kolaz3.png';
+const cutoutTwo = imgUrl(about.cutoutImageTwo, 640) ?? '/assets/kolaz_transparent.png';
+
+const fallbackValues = {
+  me: [
+    { title: 'Povjerljivost', description: 'Sve što nam povjerite ostaje između nas. Bez izuzetka.' },
+    { title: 'Solidarnost', description: 'Nijedna žena nije sama - stojimo jedna uz drugu.' },
+    { title: 'Hrabrost', description: 'Govorimo glasno i onda kada je ćutanje lakše.' },
+    { title: 'Odgovornost', description: 'Stručni i profesionalni pristup u radu.' },
+  ],
+  en: [
+    { title: 'Confidentiality', description: 'Everything you share stays between us. No exceptions.' },
+    { title: 'Solidarity', description: 'No woman stands alone - we stand with each other.' },
+    { title: 'Courage', description: 'We speak up even when staying silent would be easier.' },
+    { title: 'Accountability', description: 'An expert and professional approach to our work.' },
+  ],
+};
+
+const fallbackCards = {
+  me: [
+    { title: 'Smještaj u skloništu-prihvatilištu', description: 'Siguran i bezbjedan smještaj za žene i djecu žrtve nasilja.' },
+    { title: 'Inicijalno savjetovanje putem telefona', description: 'Prvi razgovor tokom kojeg zajedno procjenjujemo vašu situaciju, potrebe i mogućnosti podrške te nakon toga definišemo naredne korake. Kontaktirajte nas za informisanje, pomoć ili podršku — dežurna linija 068 692 231.' },
+    { title: 'Usluga povjerljivog lica', description: 'Osoba od povjerenja koja prati korisnicu kroz sve postupke koji se odvijaju pred institucijama, a u vezi sa nasiljem.' },
+    { title: 'Psihološka pomoć i podrška', description: 'Stručna psihološka podrška usmjerena na očuvanje mentalnog zdravlja, prevazilaženje stresnih i kriznih situacija, kao i jačanje ličnih kapaciteta.' },
+    { title: 'Pravno upućivanje', description: 'Pružamo osnovne pravne informacije i upućujemo vas na nadležne institucije ili stručnjake kako biste ostvarili svoja prava na adekvatan način.' },
+    { title: 'Savjetodavni razgovori u kancelariji', description: 'Povjerljiv i podržavajući razgovor u sigurnom prostoru uz stručnu pomoć, individualni pristup i razumijevanje.' },
+    { title: 'Prijavljivanje nasilja nadležnim institucijama', description: 'Pružamo podršku ženama prilikom prijavljivanja nasilja nadležnim institucijama, uključujući informisanje o postupku, pratnju i podršku u komunikaciji.' },
+  ],
+  en: [
+    { title: 'Shelter accommodation', description: 'Safe and secure accommodation for women and children who are victims of violence.' },
+    { title: 'Initial phone counselling', description: 'A first conversation in which we assess your situation, needs and support options together, and then define the next steps. Contact us for information, help or support — helpline 068 692 231.' },
+    { title: 'Confidential support person', description: 'A trusted person who accompanies the woman through all proceedings before institutions related to the violence.' },
+    { title: 'Psychological help and support', description: 'Professional psychological support focused on preserving mental health, overcoming stressful and crisis situations, and strengthening personal capacities.' },
+    { title: 'Legal guidance', description: 'We provide basic legal information and refer you to the competent institutions or professionals so you can exercise your rights properly.' },
+    { title: 'Counselling sessions at our office', description: 'A confidential and supportive conversation in a safe space, with professional help, an individual approach and understanding.' },
+    { title: 'Reporting violence to the competent institutions', description: 'We support women when reporting violence to the competent institutions, including information about the procedure, accompaniment and support in communication.' },
+  ],
+};
+
+const values = about.values?.length ? about.values : null;
+const cards = about.cards?.length ? about.cards : null;
+
+const heroIntroBlocks = about.heroIntro?.[lang];
+const bigWord = L(about.bigWord, lang === 'me' ? 'Glasan otpor' : 'Loud resistance');
+
+/* Svaka doodle grafika je isječena tačno na crtež (bez praznog platna),
+   pa "corner" mora odgovarati uglu u kojem crtež stvarno leži unutar
+   isječene slike — inače art ne dodiruje ivicu kartice kako treba. */
+const doodles = [
+  { file: 'card-doodle-1.png', w: 634, h: 614, corner: 'bl' },
+  { file: 'card-doodle-2.png', w: 413, h: 772, corner: 'r' },
+  { file: 'card-doodle-3.png', w: 589, h: 562, corner: 'tl' },
+  { file: 'card-doodle-4.png', w: 587, h: 479, corner: 'br' },
+];
 ---
 
 <BaseLayout lang={lang} title={t(lang, 'about_page_title')} description={description}>
-  <div class="page-head">
-    <div class="wrap" data-reveal>
-      <div class="eyebrow">{t(lang, 'about_page_title')}</div>
-      <h1>{lang === 'me' ? 'Nevladino udruženje Lea Bar' : 'Lea Bar Non-Governmental Association'}</h1>
-      <p>
-        {lang === 'me'
-          ? 'Organizacija iz Bara koja radi na prevenciji nasilja i osnaživanju žena i djevojaka.'
-          : 'An organisation from Bar working on violence prevention and the empowerment of women and girls.'}
-      </p>
-    </div>
-  </div>
-
-  <section class="sec">
-    <div class="wrap two-col">
-      <div>
-        <p>
-          {lang === 'me'
-            ? 'Nevladino udruženje Lea Bar djeluje u Baru, Crna Gora, sa fokusom na prevenciju nasilja, osnaživanje djevojaka i podršku roditeljima. U okviru rada vodimo i sklonište za žene i djecu žrtve nasilja.'
-            : 'The Lea Bar association operates in Bar, Montenegro, focusing on violence prevention, empowering girls and supporting parents. As part of our work, we also run a shelter for women and children who are victims of violence.'}
-        </p>
-        <p>
-          {lang === 'me'
-            ? 'Naš rad obuhvata direktnu podršku ženama i djeci, edukaciju djevojaka kroz vršnjačke programe i saradnju sa školama, institucijama i drugim organizacijama u regionu.'
-            : 'Our work includes direct support for women and children, education of girls through peer programmes, and cooperation with schools, institutions and other organisations in the region.'}
-        </p>
+  <!-- 1 · HERO -->
+  <section class="ab-hero">
+    <div class="wrap ab-hero-grid">
+      <div data-reveal>
+        <h1 class="ab-display">
+          {L(about.heroTitle, lang === 'me'
+            ? 'Ko smo mi'
+            : 'Who we are')}
+        </h1>
+        <div class="ab-hero-intro">
+          {heroIntroBlocks ? (
+            <PortableText value={heroIntroBlocks} />
+          ) : lang === 'me' ? (
+            <p>
+              Mi smo ženska nevladina organizacija iz Bara koja se bavi problemom nasilja u
+              porodici, sa misijom da bez izuzetka svakoj žrtvi nasilja pruži{' '}
+              <strong>siguran i hitan smještaj, psihosocijalnu podršku, pravno savjetovanje
+              i zdravstvenu zaštitu</strong>, ali i da ih osnažimo na putu ka izlasku iz
+              začaranog kruga nasilja i izgradnji samostalnog i dostojanstvenog života.
+            </p>
+          ) : (
+            <p>
+              We are a women's non-governmental organisation from Bar dealing with the
+              problem of domestic violence, with a mission to provide every victim of
+              violence, without exception, with <strong>safe and urgent accommodation,
+              psychosocial support, legal counselling and healthcare</strong> - and to
+              empower them on the path out of the vicious cycle of violence and towards
+              building an independent and dignified life.
+            </p>
+          )}
+        </div>
+        <a class="ab-btn-outline" href={localizePath('/kontakt/', lang)}>
+          {L(about.heroCta, lang === 'me' ? 'Kontaktirajte nas' : 'Contact us')}
+        </a>
       </div>
-      <div class="values">
-        <div class="value">
-          <b>{lang === 'me' ? 'Povjerljivost' : 'Confidentiality'}</b>
-          <span>
-            {lang === 'me'
-              ? 'Lokacija naših prostorija nije javna i nikada se ne objavljuje.'
-              : 'The location of our premises is not public and is never published.'}
-          </span>
-        </div>
-        <div class="value">
-          <b>{lang === 'me' ? 'Bez osuđivanja' : 'No judgement'}</b>
-          <span>{lang === 'me' ? 'Ne tražimo objašnjenja i ne postavljamo uslove.' : 'We ask for no explanations and set no conditions.'}</span>
-        </div>
-        <div class="value">
-          <b>{lang === 'me' ? 'Odluka je vaša' : 'The decision is yours'}</b>
-          <span>{lang === 'me' ? 'Pomažemo, ali ne odlučujemo umjesto vas.' : 'We help, but we do not decide for you.'}</span>
+
+      <div class="ab-hero-visual" data-reveal style="--reveal-delay:150ms">
+        <div class="ab-hero-video-frame">
+          <video
+            src="/assets/sesira_background_loop_1610x1080.mp4"
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            data-ambient
+            aria-hidden="true"
+          ></video>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="sec sec-dark">
+  <!-- 1b · KADAR KOJI SE ŠIRI SKROLOM -->
+  <section class="se-zone" id="se-zone">
+    <div class="se-stage">
+      <div class="se-frame" id="se-frame">
+        <video
+          class="se-media"
+          id="se-media"
+          src="/assets/video2.mp4"
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          data-ambient
+          aria-hidden="true"
+        ></video>
+        <div class="se-overlay" aria-hidden="true"></div>
+        <div class="se-scrim" id="se-scrim" aria-hidden="true"></div>
+      </div>
+      <p class="se-title ab-display" id="se-title">
+        {lang === 'me' ? 'Zajednica koja ne ćuti' : 'A community that won’t stay silent'}
+      </p>
+      <p class="se-hint" id="se-hint" aria-hidden="true">{lang === 'me' ? 'Skrolujte' : 'Scroll'}</p>
+    </div>
+  </section>
+
+  <!-- 2 · MISIJA / VIZIJA / VRIJEDNOSTI -->
+  <section class="ab-split">
+    <div class="ab-split-left">
+      <div class="ab-split-block" data-reveal>
+        <p class="ab-eyebrow">{L(about.missionLabel, lang === 'me' ? 'Misija' : 'Mission')}</p>
+        <p class="ab-display ab-statement">
+          {L(about.missionText, lang === 'me'
+            ? 'Naša misija je da svakoj ženi i djetetu koji su preživjeli nasilje obezbijedimo sigurno okruženje, podršku i zaštitu, osnažujući ih da žive slobodno, dostojanstveno i bez nasilja.'
+            : 'Our mission is to ensure a safe environment, support and protection for every woman and child who has survived violence, empowering them to live freely, with dignity and free from violence.')}
+        </p>
+      </div>
+
+      <div class="ab-split-block" data-reveal>
+        <p class="ab-eyebrow">{L(about.visionLabel, lang === 'me' ? 'Vizija' : 'Vision')}</p>
+        <p class="ab-display ab-statement">
+          {about.visionText?.[lang] ?? (lang === 'me' ? (
+            <Fragment>
+              je društvo u kojem svaka žena i svako dijete žive{' '}
+              <a href={localizePath('/projekti/', lang)}>bez nasilja, straha i diskriminacije</a>,
+              uz jednak pristup zaštiti, pravdi i mogućnosti za dostojanstven život.
+            </Fragment>
+          ) : (
+            <Fragment>
+              is a society in which every woman and every child lives{' '}
+              <a href={localizePath('/projekti/', lang)}>free from violence, fear and discrimination</a>,
+              with equal access to protection, justice and the opportunity for a dignified life.
+            </Fragment>
+          ))}
+        </p>
+      </div>
+
+      <div class="ab-split-block" data-reveal>
+        <p class="ab-eyebrow">{L(about.valuesLabel, lang === 'me' ? 'Naše vrijednosti' : 'Our values')}</p>
+        <div class="ab-values-grid">
+          {(values ?? fallbackValues[lang]).map((v, i) => (
+            <div class="ab-value">
+              <span class="ab-value-badge" aria-hidden="true">
+                {v.icon?.asset ? (
+                  <img src={urlFor(v.icon).width(44).url()} alt="" width="22" height="22" />
+                ) : [
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>,
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/></svg>,
+                  <img src="/assets/brave-icon.png" alt="" width="22" height="22" loading="lazy" />,
+                  <img src="/assets/social-responsibility.png" alt="" width="22" height="22" loading="lazy" />,
+                ][i % 4]}
+              </span>
+              <h3>{v.title?.[lang] ?? v.title}</h3>
+              <p>{v.description?.[lang] ?? v.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="ab-split-right">
+      <div class="ab-bigword" aria-hidden="true">{bigWord}</div>
+      <div class="ab-panel-photo ab-panel-logo">
+        <img src="/assets/nulea-logo.svg" alt="NU Lea Bar logo" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · ŠTA RADIMO -->
+  <section class="ab-wwd">
+    <div class="ab-cutout ab-cutout-1" aria-hidden="true">
+      <img src={cutoutOne} alt="" loading="lazy" width="640" height="360" />
+    </div>
+    <div class="ab-cutout ab-cutout-2" aria-hidden="true">
+      <img src={cutoutTwo} alt="" loading="lazy" width="640" height="640" />
+    </div>
+
     <div class="wrap">
-      <div class="sec-head"><h2>{lang === 'me' ? 'Sa kim sarađujemo' : 'Who we work with'}</h2></div>
-      <div class="two-col">
-        <p>
-          {lang === 'me'
-            ? 'Projekte sprovodimo u partnerstvu sa organizacijama iz regiona, uz podršku Evropske unije, lokalne samouprave i drugih donatora.'
-            : 'We implement projects in partnership with organisations from the region, with support from the European Union, local government and other donors.'}
-        </p>
-        <p>
-          {lang === 'me'
-            ? 'Spisak partnera i donatora po projektu možete vidjeti na pojedinačnim stranicama projekata.'
-            : 'A list of partners and donors per project is available on the individual project pages.'}
-        </p>
+      <h2 class="ab-display" data-reveal>
+        {L(about.whatWeDoTitle, lang === 'me' ? 'Šta radimo' : 'What we do')}
+      </h2>
+      <p class="ab-wwd-intro" data-reveal>
+        {L(about.whatWeDoIntro, lang === 'me'
+          ? 'Pružamo siguran smještaj i sveobuhvatnu podršku ženama i djeci žrtvama nasilja - psihološku i psihosocijalnu podršku, pravno informisanje i savjetovanje, podršku u ostvarivanju prava i komunikaciji sa institucijama, kao i pomoć na putu oporavka, osnaživanja i osamostaljivanja. Istovremeno radimo na prevenciji nasilja, edukaciji, podizanju svijesti, zaštiti ljudskih prava, rodnoj ravnopravnosti i unapređenju sistema zaštite kroz zagovaranje i saradnju sa institucijama i partnerima.'
+          : 'We provide safe accommodation and comprehensive support to women and children affected by violence - psychological and psychosocial support, legal information and counselling, support in exercising their rights and communicating with institutions, as well as help on the path to recovery, empowerment and independence. At the same time, we work on violence prevention, education, awareness raising, the protection of human rights, gender equality and strengthening the protection system through advocacy and cooperation with institutions and partners.')}
+      </p>
+      <p class="ab-wwd-lead" data-reveal>
+        {about.whatWeDoLead?.[lang] ?? (lang === 'me' ? (
+          <Fragment>
+            <strong>Naš cilj je zajednica u kojoj nasilje nema gdje da se sakrije.</strong>{' '}
+            <span class="ab-wwd-services">Do toga dolazimo kroz naše servise podrške:</span>
+          </Fragment>
+        ) : (
+          <Fragment>
+            <strong>Our goal is a community where violence has nowhere left to hide.</strong>{' '}
+            <span class="ab-wwd-services">We get there through our support services:</span>
+          </Fragment>
+        ))}
+      </p>
+
+      <div class="ab-cards" data-ab-acc role="list">
+        {(cards ?? fallbackCards[lang]).map((c, i) => {
+          const doodle = doodles[i % doodles.length];
+          return (
+          <div class="ab-card" role="listitem" tabindex="0" data-reveal>
+            <img
+              class={`ab-card-doodle ab-card-doodle--${doodle.corner}`}
+              src={`/assets/${doodle.file}`}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              width={doodle.w}
+              height={doodle.h}
+            />
+            <span class="ab-card-vtitle" aria-hidden="true">{c.title?.[lang] ?? c.title}</span>
+            <div class="ab-card-body">
+              <h3>{c.title?.[lang] ?? c.title}</h3>
+              <p>{c.description?.[lang] ?? c.description}</p>
+            </div>
+          </div>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* Harmonika na karticama "Šta radimo": aktivna kartica se širi (flex-grow),
+       ostale se sužavaju na vertikalni naslov. Čisti CSS transition — stilovi
+       važe samo uz .has-js na <html>, pa je bez JS-a ovo obična mreža. */
+    document.querySelectorAll('[data-ab-acc]').forEach((acc) => {
+      const el = acc as HTMLElement;
+      const cards = Array.from(acc.querySelectorAll('.ab-card')) as HTMLElement[];
+      if (cards.length < 2) return;
+
+      /* mora pratiti flex-grow za .ab-card.is-open u global.css */
+      const OPEN_GROW = 11;
+      const CLOSED_GROW = 1;
+
+      /* Izmjeri stvarnu širinu reda i izračunaj koliko piksela zauzima
+         otvorena kartica — ista logika kao flex-grow u CSS-u, samo u JS-u
+         da tekst dobije fiksnu, tačnu širinu (vidi napomenu u global.css). */
+      const measure = () => {
+        const rowWidth = el.getBoundingClientRect().width;
+        const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || '24');
+        /* Uz border-box osnova flex stavke ne može ispod padding+border,
+           pa svaka kartica kreće od te "baze"; grow raspoređuje samo
+           ostatak. Bez ovoga je izračunata širina veća od stvarne i
+           tekst se siječe na ivicama kartice. */
+        const cardCS = getComputedStyle(cards[0]);
+        const base =
+          parseFloat(cardCS.paddingLeft) + parseFloat(cardCS.paddingRight) +
+          parseFloat(cardCS.borderLeftWidth) + parseFloat(cardCS.borderRightWidth);
+        const usable = rowWidth - gap * (cards.length - 1) - base * cards.length;
+        const totalUnits = OPEN_GROW + (cards.length - 1) * CLOSED_GROW;
+        const openWidth = base + (usable * OPEN_GROW) / totalUnits;
+        el.style.setProperty('--ab-body-w', `${Math.round(openWidth)}px`);
+      };
+
+      const set = (idx: number) => {
+        cards.forEach((c, j) => {
+          c.classList.toggle('is-open', j === idx);
+          c.classList.toggle('is-before', j < idx);
+          c.classList.toggle('is-after', j > idx);
+        });
+      };
+
+      measure();
+      if ('ResizeObserver' in window) new ResizeObserver(measure).observe(el);
+      else window.addEventListener('resize', measure);
+
+      cards.forEach((c, i) => {
+        c.addEventListener('mouseenter', () => set(i));
+        c.addEventListener('click', () => set(i));
+        c.addEventListener('focus', () => set(i));
+        c.addEventListener('keydown', (e) => {
+          let n: number | null = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % cards.length;
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + cards.length) % cards.length;
+          if (n !== null) {
+            e.preventDefault();
+            set(n);
+            cards[n].focus();
+          }
+        });
+      });
+
+      set(0);
+    });
+  </script>
+
+  <!-- 4 · CTA -->
+  <section class="ab-cta">
+    <div class="wrap" data-reveal>
+      <h2 class="ab-display">
+        {L(about.ctaHeading, lang === 'me'
+          ? 'Promjena počinje kada zajednica prestane da ćuti.'
+          : 'Change begins when a community stops staying silent.')}
+      </h2>
+      <div class="ab-cta-row">
+        <a class="ab-btn-fill" href={localizePath('/doniraj/', lang)}>
+          {lang === 'me' ? 'Doniraj' : 'Donate'}
+        </a>
+        <a class="ab-btn-outline-light" href={localizePath('/kontakt/', lang)}>
+          {lang === 'me' ? 'Kontakt' : 'Contact'}
+        </a>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  /* Širenje kadra skrolom (po uzoru na ScrollExpand): napredak kroz zonu
+     otvara clip-path okvira do punog ekrana, smanjuje zum fotografije i
+     podiže naslov. Bez JS-a ili uz smanjeno kretanje sekcija je statičan
+     kadar — zato se aktivni režim uključuje tek klasom .se-on. */
+  const zone = document.getElementById('se-zone');
+  const frame = document.getElementById('se-frame');
+  const media = document.getElementById('se-media');
+  const titleEl = document.getElementById('se-title');
+  const scrim = document.getElementById('se-scrim');
+  const hint = document.getElementById('se-hint');
+
+  if (zone && frame && media && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    zone.classList.add('se-on');
+
+    const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
+    const smoothstep = (a: number, b: number, x: number) => {
+      const t = clamp((x - a) / (b - a), 0, 1);
+      return t * t * (3 - 2 * t);
+    };
+
+    const START_W = 42, START_H = 58, START_R = 24, ZOOM = 1.35, DIST = 1.2, SCRIM = 0.45;
+    let cur = 0, tgt = 0, raf = 0;
+
+    const apply = (p: number) => {
+      const e = smoothstep(0, 1, p);
+      const w = START_W + (100 - START_W) * e;
+      const h = START_H + (100 - START_H) * e;
+      const ix = Math.max(0, (100 - w) / 2);
+      const iy = Math.max(0, (100 - h) / 2);
+      frame.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${START_R * (1 - e)}px)`;
+      media.style.transform = `scale(${ZOOM + (1 - ZOOM) * e})`;
+      if (scrim) scrim.style.opacity = String(SCRIM * e);
+      if (titleEl) {
+        const out = smoothstep(0.4, 0.88, p);
+        titleEl.style.opacity = String(1 - out);
+        titleEl.style.transform = `translate3d(0,${-28 * out}px,0) scale(${1 + 0.06 * out})`;
+      }
+      if (hint) hint.style.opacity = String(1 - smoothstep(0, 0.12, p));
+    };
+
+    const read = () => clamp(-zone.getBoundingClientRect().top / (window.innerHeight * DIST), 0, 1);
+    const k = 1 - Math.exp(-1 / (60 * 0.1));
+    const tick = () => {
+      cur += (tgt - cur) * k;
+      if (Math.abs(tgt - cur) < 0.0004) {
+        cur = tgt;
+        raf = 0;
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+      apply(cur);
+    };
+    const onScroll = () => {
+      tgt = read();
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    cur = tgt = read();
+    apply(cur);
+  }
+</script>

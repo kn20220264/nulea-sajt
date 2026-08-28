@@ -38,6 +38,21 @@ const coverUrl = news.coverImage?.asset
     <article class="article-body">
       <PortableText value={news.body?.[lang]} />
 
+      {news.gallery && news.gallery.length > 0 && (
+        <div>
+          <h2>{t(lang, 'gallery_heading')}</h2>
+          <div class="gallery-grid">
+            {news.gallery.map((img) => (
+              <img
+                src={urlFor(img.asset).width(500).height(500).fit('crop').auto('format').url()}
+                alt={(lang === 'me' ? img.altMe : img.altEn) || img.alt || ''}
+                loading="lazy"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {news.relatedProject && (
         <p>
           <strong>{t(lang, 'related_project')}:</strong>{' '}

@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/i18n.js';
+
+const { lang } = Astro.props;
+
+const title = lang === 'me' ? 'Doniraj' : 'Donate';
+const lead =
+  lang === 'me'
+    ? 'Vaša donacija direktno podržava rad našeg udruženja u borbi protiv nasilja.'
+    : 'Your donation directly supports our association’s work in the fight against violence.';
+
+const recipient = 'Sklonište za žene i djecu žrtve nasilja LEA Bar';
+---
+
+<BaseLayout lang={lang} title={title} description={lead}>
+  <div class="contact-hero">
+    <div class="wrap" data-reveal>
+      <div class="eyebrow">{title}</div>
+      <h1 class="ab-display">{lang === 'me' ? 'Budi dio podrške' : 'Be part of the support'}</h1>
+      <p>{lead}</p>
+    </div>
+  </div>
+
+  <section class="contact-panel-sec">
+    <div class="wrap">
+      <div class="contact-panel" data-reveal>
+        <div class="eyebrow">{lang === 'me' ? 'Nacionalne uplate' : 'Domestic payments'}</div>
+        <h2>{lang === 'me' ? 'Uplata na žiro račun' : 'Donate by bank transfer'}</h2>
+        <p class="contact-panel-intro">
+          {lang === 'me'
+            ? 'Donacije primamo direktnom uplatom na račun udruženja. Uplatu možete izvršiti u banci, pošti ili preko e-bankinga.'
+            : 'We receive donations directly to the association’s bank account. You can pay at any bank, post office or through e-banking.'}
+        </p>
+
+        <div class="contact-card">
+          <dl class="don-rows">
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Primalac' : 'Recipient'}</dt>
+              <dd>{recipient}</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Adresa' : 'Address'}</dt>
+              <dd>Brbot bb, Bar</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Banka' : 'Bank'}</dt>
+              <dd>LOVĆEN BANKA</dd>
+            </div>
+            <div class="don-row">
+              <dt>{t(lang, 'donation_account_label')}</dt>
+              <dd id="don-account">565-7196-33</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Svrha uplate' : 'Payment purpose'}</dt>
+              <dd>{lang === 'me' ? 'Donacija, 11096832' : 'Donation, 11096832'}</dd>
+            </div>
+          </dl>
+          <button
+            class="btn btn-primary don-copy"
+            type="button"
+            data-copy-source="don-account"
+            data-label={lang === 'me' ? 'Kopiraj broj računa' : 'Copy account number'}
+            data-copied={lang === 'me' ? 'Kopirano ✓' : 'Copied ✓'}
+          >
+            {lang === 'me' ? 'Kopiraj broj računa' : 'Copy account number'}
+          </button>
+        </div>
+      </div>
+
+      <div class="contact-panel" data-reveal>
+        <div class="eyebrow">{lang === 'me' ? 'Uplate iz inostranstva' : 'International payments'}</div>
+        <h2>{lang === 'me' ? 'Devizna uplata' : 'Donate from abroad'}</h2>
+        <p class="contact-panel-intro">
+          {lang === 'me'
+            ? 'Za uplate iz inostranstva koristite sljedeće podatke.'
+            : 'For payments from abroad, please use the following details.'}
+        </p>
+
+        <div class="contact-card">
+          <dl class="don-rows">
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Primalac' : 'Beneficiary'}</dt>
+              <dd>{recipient}</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Adresa' : 'Address'}</dt>
+              <dd>Brbot bb, Bar</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Banka' : 'Bank'}</dt>
+              <dd>LOVĆEN BANKA AD PODGORICA</dd>
+            </div>
+            <div class="don-row">
+              <dt>SWIFT</dt>
+              <dd>LOVBMEPGXXX</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Broj računa' : 'Account number'}</dt>
+              <dd>001-55.097.455</dd>
+            </div>
+            <div class="don-row">
+              <dt>IBAN</dt>
+              <dd id="don-iban">ME25 5655 0000 0000 5129 52</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Korespondentna banka' : 'Correspondent bank'}</dt>
+              <dd>Raiffeisen Bank International AG</dd>
+            </div>
+            <div class="don-row">
+              <dt>{lang === 'me' ? 'Grad i država' : 'City and country'}</dt>
+              <dd>{lang === 'me' ? 'Beč, Austrija' : 'Vienna, Austria'}</dd>
+            </div>
+            <div class="don-row">
+              <dt>SWIFT {lang === 'me' ? 'korespondentne banke' : 'of correspondent bank'}</dt>
+              <dd>RZBAATWW</dd>
+            </div>
+          </dl>
+          <button
+            class="btn btn-primary don-copy"
+            type="button"
+            data-copy-source="don-iban"
+            data-label={lang === 'me' ? 'Kopiraj IBAN' : 'Copy IBAN'}
+            data-copied={lang === 'me' ? 'Kopirano ✓' : 'Copied ✓'}
+          >
+            {lang === 'me' ? 'Kopiraj IBAN' : 'Copy IBAN'}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  /* Kopiranje broja računa / IBAN-a — dugmad su vidljiva samo uz JS (.has-js). */
+  document.querySelectorAll<HTMLButtonElement>('.don-copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const sourceId = btn.getAttribute('data-copy-source') ?? '';
+      const value = document.getElementById(sourceId)?.textContent?.trim() ?? '';
+      try {
+        await navigator.clipboard.writeText(value);
+        btn.textContent = btn.getAttribute('data-copied') ?? '';
+        setTimeout(() => {
+          btn.textContent = btn.getAttribute('data-label') ?? '';
+        }, 2000);
+      } catch {
+        /* Bez pristupa clipboard-u dugme ne mijenja stanje — podatak ostaje vidljiv za ručno kopiranje. */
+      }
+    });
+  });
+</script>

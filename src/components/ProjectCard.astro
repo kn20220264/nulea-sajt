@@ -1,0 +1,47 @@
+---
+import { t, statusLabel, localizePath } from '../lib/i18n.js';
+import { urlFor } from '../lib/sanity.js';
+
+const { lang, project, index = 0 } = Astro.props;
+const href = localizePath(`/projekti/${project.slug}/`, lang);
+
+function year(dateStr) {
+  return dateStr ? new Date(dateStr).getFullYear() : '';
+}
+const startYear = year(project.startDate);
+const endYear = year(project.endDate);
+const period =
+  endYear && endYear !== startYear ? `${startYear}-${endYear}` : `${startYear}`;
+
+const image = project.coverImage;
+const imgUrl = image?.asset
+  ? urlFor(image).width(800).height(600).fit('crop').auto('format').url()
+  : null;
+const imgAlt =
+  (lang === 'en' ? image?.altEn : image?.altMe) || image?.alt || project.title[lang];
+---
+
+<a
+  class="pcard"
+  href={href}
+  data-status={project.status}
+  data-reveal
+  style={`--reveal-delay:${(index % 4) * 90}ms`}
+>
+  <div class="pcard-img">
+    {imgUrl ? (
+      <img src={imgUrl} alt={imgAlt} loading="lazy" />
+    ) : (
+      <div class="pcard-fallback" aria-hidden="true">
+        <img src="/assets/nulea-logo.svg" alt="" loading="lazy" />
+      </div>
+    )}
+  </div>
+  <div class="pcard-meta">
+    <span class={`chip ${project.status}`}>{statusLabel(lang, project.status)}</span>
+    {period && <span class="pcard-years">{period}</span>}
+  </div>
+  <h3 class="pcard-title">{project.title[lang]}</h3>
+  <p class="pcard-desc">{project.summary[lang]}</p>
+  <span class="pcard-link">{t(lang, 'read_more')} <span class="arrow">→</span></span>
+</a>

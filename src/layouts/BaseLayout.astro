@@ -1,11 +1,15 @@
 ---
+import '@fontsource/figtree/400.css';
+import '@fontsource/figtree/700.css';
+import '@fontsource/figtree/800.css';
+import '@fontsource/anton/400.css';
 import '../styles/global.css';
 import { HTML_LANG, t, localizePath } from '../lib/i18n.js';
 import { getSiteSettings } from '../lib/queries.js';
-import SafetyBar from '../components/SafetyBar.astro';
+import QuickExitButton from '../components/QuickExitButton.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import PrivacyNotice from '../components/PrivacyNotice.astro';
+import SafetyBand from '../components/SafetyBand.astro';
 
 const { lang, title, description } = Astro.props;
 const settings = await getSiteSettings();
@@ -17,32 +21,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title} — NU Lea Bar</title>
+    <title>{title} | NU Lea Bar</title>
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="me" href={new URL(localizePath(Astro.url.pathname, 'me'), Astro.site).toString()} />
     <link rel="alternate" hreflang="en" href={new URL(localizePath(Astro.url.pathname, 'en'), Astro.site).toString()} />
     <link rel="icon" href="/assets/logo.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Figtree:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
     <a class="skip-link" href="#main">{t(lang, 'skip_to_content')}</a>
+    <QuickExitButton lang={lang} quickExitUrl={settings.quickExitUrl} />
 
-    <SafetyBar lang={lang} sosNumber={settings.sosNumber} sosNote={settings.sosNote[lang]} quickExitUrl={settings.quickExitUrl} />
     <SiteHeader lang={lang} />
-    <PrivacyNotice lang={lang} />
 
     <main id="main">
       <slot />
     </main>
 
-    <SiteFooter lang={lang} email={settings.email} sosNumber={settings.sosNumber} />
+    <SiteFooter lang={lang} />
+    <SafetyBand lang={lang} sosNumber={settings.sosNumber} sosNote={settings.sosNote[lang]} />
 
     <script>
       document.documentElement.classList.add('has-js');
@@ -61,6 +59,28 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
           { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
         );
         revealEls.forEach((el) => io.observe(el));
+      }
+
+      /* Ambijentalni video zapisi (data-ambient): puštaju se tek kad uđu u
+         ekran i pauziraju kad izađu — video od 12MB se tako ne vrti u prazno.
+         Uz smanjeno kretanje se uopšte ne pokreću; bez JS-a ostaje prvi kadar. */
+      const ambient = document.querySelectorAll('video[data-ambient]');
+      if (ambient.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        const vio = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const v = entry.target as HTMLVideoElement;
+              if (entry.isIntersecting) {
+                v.muted = true;
+                v.play().catch(() => {});
+              } else {
+                v.pause();
+              }
+            });
+          },
+          { threshold: 0.2 }
+        );
+        ambient.forEach((v) => vio.observe(v));
       }
     </script>
   </body>

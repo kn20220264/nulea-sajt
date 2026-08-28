@@ -4,33 +4,117 @@ import { t, localizePath } from '../lib/i18n.js';
 const { lang } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-const navItems = [
-  { key: 'nav_home', path: '/' },
-  { key: 'nav_news', path: '/vijesti/' },
-  { key: 'nav_projects', path: '/projekti/' },
-  { key: 'nav_about', path: '/o-nama/' },
-  { key: 'nav_contact', path: '/kontakt/' },
-];
+const groups = {
+  rad: [
+    { key: 'nav_projects', path: '/projekti/' },
+    { key: 'nav_news', path: '/vijesti/' },
+  ],
+  resursi: [
+    { key: 'nav_publications', path: '/publikacije/' },
+    { key: 'nav_reports', path: '/izvjestaji/' },
+  ],
+  kontakt: [
+    { key: 'nav_contact', path: '/kontakt/' },
+    { key: 'nav_donate', path: '/doniraj/' },
+  ],
+};
 
 function isCurrent(path) {
-  const target = localizePath(path, lang);
-  return currentPath === target;
+  return currentPath === localizePath(path, lang);
+}
+/* Roditelj je aktivan kad je bilo koja podstranica djeteta otvorena —
+   računa se iz URL putanje, ne iz ručne oznake. */
+function isWithin(items) {
+  return items.some((item) => currentPath.startsWith(localizePath(item.path, lang)));
 }
 ---
 
 <header class="site-head">
   <div class="wrap">
-    <a class="brand" href={localizePath('/', lang)}>
-      <img src="/assets/logo.png" alt="NU Lea Bar" />
+    <a class="brand" href={localizePath('/', lang)} aria-label={t(lang, 'brand_home_label')}>
+      <img src="/assets/nulea-logo.svg" alt="" />
       <span>{t(lang, 'orgType')}</span>
     </a>
-    <nav class="site-nav" id="nav">
-      {navItems.map((item) => (
-        <a href={localizePath(item.path, lang)} aria-current={isCurrent(item.path) ? 'page' : undefined}>
-          {t(lang, item.key)}
-        </a>
-      ))}
+
+    <nav class="site-nav" id="nav" aria-label={t(lang, 'menu_label')}>
+      <ul class="nav-list">
+        <li>
+          <a href={localizePath('/o-nama/', lang)} aria-current={isCurrent('/o-nama/') ? 'page' : undefined}>
+            {t(lang, 'nav_about')}
+          </a>
+        </li>
+        <li class="nav-dd" data-dd>
+          <button
+            type="button"
+            class:list={['nav-dd-btn', { 'is-active': isWithin(groups.rad) }]}
+            aria-expanded="false"
+            aria-controls="nav-dd-rad"
+          >
+            {t(lang, 'nav_our_work')}
+            <svg class="nav-dd-chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+              <path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <span class="nav-group-label">{t(lang, 'nav_our_work')}</span>
+          <ul class="nav-dd-menu" id="nav-dd-rad" hidden>
+            {groups.rad.map((item) => (
+              <li>
+                <a href={localizePath(item.path, lang)} aria-current={isCurrent(item.path) ? 'page' : undefined}>
+                  {t(lang, item.key)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </li>
+        <li class="nav-dd" data-dd>
+          <button
+            type="button"
+            class:list={['nav-dd-btn', { 'is-active': isWithin(groups.resursi) }]}
+            aria-expanded="false"
+            aria-controls="nav-dd-resursi"
+          >
+            {t(lang, 'nav_resources')}
+            <svg class="nav-dd-chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+              <path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <span class="nav-group-label">{t(lang, 'nav_resources')}</span>
+          <ul class="nav-dd-menu" id="nav-dd-resursi" hidden>
+            {groups.resursi.map((item) => (
+              <li>
+                <a href={localizePath(item.path, lang)} aria-current={isCurrent(item.path) ? 'page' : undefined}>
+                  {t(lang, item.key)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </li>
+        <li class="nav-dd" data-dd>
+          <button
+            type="button"
+            class:list={['nav-dd-btn', { 'is-active': isWithin(groups.kontakt) }]}
+            aria-expanded="false"
+            aria-controls="nav-dd-kontakt"
+          >
+            {t(lang, 'nav_contact')}
+            <svg class="nav-dd-chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+              <path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <span class="nav-group-label">{t(lang, 'nav_contact')}</span>
+          <ul class="nav-dd-menu" id="nav-dd-kontakt" hidden>
+            {groups.kontakt.map((item) => (
+              <li>
+                <a href={localizePath(item.path, lang)} aria-current={isCurrent(item.path) ? 'page' : undefined}>
+                  {t(lang, item.key)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </li>
+      </ul>
     </nav>
+
     <div class="head-right">
       <div class="lang">
         <a href={localizePath(currentPath, 'me')} aria-current={lang === 'me' ? 'true' : undefined} hreflang="me">CG</a>
@@ -42,10 +126,137 @@ function isCurrent(path) {
 </header>
 
 <script>
-  const burger = document.getElementById('burger');
   const nav = document.getElementById('nav');
-  burger?.addEventListener('click', () => {
-    const open = nav?.classList.toggle('open');
-    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const burger = document.getElementById('burger');
+  const mql = window.matchMedia('(max-width: 900px)');
+  const dds = Array.from(document.querySelectorAll('[data-dd]'));
+
+  function parts(dd: Element) {
+    return {
+      btn: dd.querySelector('.nav-dd-btn') as HTMLButtonElement | null,
+      menu: dd.querySelector('.nav-dd-menu') as HTMLElement | null,
+    };
+  }
+
+  function closeDd(dd: Element) {
+    const { btn, menu } = parts(dd);
+    btn?.setAttribute('aria-expanded', 'false');
+    if (!mql.matches) menu?.setAttribute('hidden', '');
+  }
+  function closeAll(except?: Element) {
+    dds.forEach((dd) => {
+      if (dd !== except) closeDd(dd);
+    });
+  }
+
+  dds.forEach((dd) => {
+    const { btn, menu } = parts(dd);
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', () => {
+      const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+      closeAll(dd);
+      btn.setAttribute('aria-expanded', String(!wasOpen));
+      if (wasOpen) menu.setAttribute('hidden', '');
+      else menu.removeAttribute('hidden');
+    });
+
+    dd.addEventListener('keydown', (e) => {
+      const ev = e as KeyboardEvent;
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      const links = Array.from(menu.querySelectorAll('a')) as HTMLElement[];
+
+      if (!isOpen) {
+        if ((ev.key === 'ArrowDown' || ev.key === 'ArrowUp') && document.activeElement === btn) {
+          ev.preventDefault();
+          closeAll(dd);
+          btn.setAttribute('aria-expanded', 'true');
+          menu.removeAttribute('hidden');
+          links[0]?.focus();
+        }
+        return;
+      }
+
+      const i = links.indexOf(document.activeElement as HTMLElement);
+      if (ev.key === 'ArrowDown') {
+        ev.preventDefault();
+        (links[i + 1] ?? links[0])?.focus();
+      } else if (ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        (links[i - 1] ?? links[links.length - 1])?.focus();
+      } else if (ev.key === 'Escape') {
+        /* Namjerno BEZ stopPropagation: globalni Esc je "Brzi izlaz"
+           (sigurnosna funkcija) i mora uvijek proći. */
+        closeDd(dd);
+        btn.focus();
+      }
+    });
   });
+
+  document.addEventListener('click', (e) => {
+    if (!dds.some((dd) => dd.contains(e.target as Node))) closeAll();
+  });
+
+  /* Mobilni panel */
+  function setPanel(open: boolean) {
+    nav?.classList.toggle('open', open);
+    burger?.setAttribute('aria-expanded', String(open));
+    if (burger) burger.textContent = open ? '✕' : '☰';
+    /* zaključa skrol dok je full-screen meni otvoren */
+    document.documentElement.classList.toggle('nav-open-lock', open);
+    if (open) {
+      (nav?.querySelector('a, button') as HTMLElement | null)?.focus();
+    } else {
+      burger?.focus();
+    }
+  }
+  burger?.addEventListener('click', () => setPanel(!nav?.classList.contains('open')));
+
+  document.addEventListener('keydown', (e) => {
+    const ev = e as KeyboardEvent;
+    const open = mql.matches && nav?.classList.contains('open');
+    if (!open) return;
+
+    if (ev.key === 'Escape') {
+      /* Bez stopPropagation — Brzi izlaz na Esc ostaje nadređen. */
+      setPanel(false);
+      return;
+    }
+    if (ev.key !== 'Tab' || !nav || !burger) return;
+
+    /* Zamka fokusa: burger + sadržaj panela. Brzi izlaz ostaje dostupan
+       mišem/dodirom i preko samog Esc. */
+    const focusables = (Array.from(nav.querySelectorAll('a, button')) as HTMLElement[]).filter(
+      (el) => el.offsetParent !== null
+    );
+    const items = [burger, ...focusables];
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (ev.shiftKey && document.activeElement === first) {
+      ev.preventDefault();
+      last.focus();
+    } else if (!ev.shiftKey && document.activeElement === last) {
+      ev.preventDefault();
+      first.focus();
+    }
+  });
+
+  /* Ispod 900px podmeniji su uvijek vidljive liste (bez dropdown ponašanja);
+     na desktopu kreću zatvoreni. */
+  function applyMode() {
+    dds.forEach((dd) => {
+      const { btn, menu } = parts(dd);
+      btn?.setAttribute('aria-expanded', 'false');
+      if (mql.matches) menu?.removeAttribute('hidden');
+      else menu?.setAttribute('hidden', '');
+    });
+    if (!mql.matches) {
+      nav?.classList.remove('open');
+      burger?.setAttribute('aria-expanded', 'false');
+      if (burger) burger.textContent = '☰';
+      document.documentElement.classList.remove('nav-open-lock');
+    }
+  }
+  applyMode();
+  mql.addEventListener('change', applyMode);
 </script>

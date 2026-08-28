@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, reportTypeLabel } from '../../lib/i18n.js';
+import { getAllReports } from '../../lib/queries.js';
+
+const { lang } = Astro.props;
+const reports = await getAllReports();
+
+/* Grupisanje po godini — upit već sortira year desc, title.me asc,
+   pa grupe nastaju redom kojim godine dolaze. */
+const groups = [];
+for (const report of reports) {
+  const year = report.year ?? null;
+  const last = groups[groups.length - 1];
+  if (last && last.year === year) last.items.push(report);
+  else groups.push({ year, items: [report] });
+}
+
+function sizeMb(bytes) {
+  if (!bytes) return '';
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+---
+
+<BaseLayout
+  lang={lang}
+  title={t(lang, 'reports_page_title')}
+  description={t(lang, 'reports_page_lead')}
+>
+  <div class="page-head">
+    <div class="wrap page-head-row" data-reveal>
+      <div>
+        <div class="eyebrow">{t(lang, 'reports_eyebrow')}</div>
+        <h1>{t(lang, 'reports_page_title')}</h1>
+        <span class="page-head-kicker" aria-hidden="true"></span>
+      </div>
+      <p class="page-head-lead">{t(lang, 'reports_page_lead')}</p>
+    </div>
+  </div>
+
+  <section class="sec">
+    <div class="wrap">
+      {groups.length > 0 ? (
+        groups.map((group, gi) => (
+          <section class="rep-year" data-reveal style={`--reveal-delay:${(gi % 3) * 90}ms`}>
+            <h2 class="rep-year-h">{group.year ?? '-'}</h2>
+            <ul class="rep-list">
+              {group.items.map((report) => {
+                const title = report.title?.[lang] ?? report.title?.me ?? '';
+                const size = sizeMb(report.pdfSize);
+                return (
+                  <li class="rep-row">
+                    <span class="rep-title">{title}</span>
+                    <span class="rep-meta">
+                      {reportTypeLabel(lang, report.type)}
+                      {size && <span class="rep-size"> · {size}</span>}
+                    </span>
+                    {report.pdfUrl ? (
+                      <a
+                        class="rep-link"
+                        href={`${report.pdfUrl}?dl=${encodeURIComponent(report.pdfFileName ?? '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                        aria-label={`${t(lang, 'download_report')}: ${title}, ${group.year ?? ''}`}
+                      >
+                        {t(lang, 'download_report')} <span class="arrow" aria-hidden="true">→</span>
+                      </a>
+                    ) : (
+                      <span class="rep-soon">{t(lang, 'report_coming_soon')}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))
+      ) : (
+        <p class="empty-note">{t(lang, 'no_reports_yet')}</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

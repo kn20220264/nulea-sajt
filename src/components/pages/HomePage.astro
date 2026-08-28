@@ -1,119 +1,531 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NewsCard from '../NewsCard.astro';
-import ProjectRow from '../ProjectRow.astro';
+import ProjectBlock from '../ProjectBlock.astro';
+import FeaturedNewsCarousel from '../FeaturedNewsCarousel.astro';
+import ImageTrail from '../ImageTrail.astro';
 import { t, localizePath } from '../../lib/i18n.js';
-import { getLatestNews, getActiveProjects } from '../../lib/queries.js';
+import { getLatestNews, getLatestProjects, getFeaturedNews } from '../../lib/queries.js';
 
 const { lang } = Astro.props;
-const [news, projects] = await Promise.all([getLatestNews(2), getActiveProjects()]);
+const [news, projects, featuredNews] = await Promise.all([
+  getLatestNews(4),
+  getLatestProjects(3),
+  getFeaturedNews(),
+]);
 
 const title = lang === 'me' ? 'Naslovna' : 'Home';
 const description =
   lang === 'me'
-    ? 'NU Lea Bar — podrška ženama, djevojkama i porodicama u Baru.'
-    : 'NU Lea Bar — support for women, girls and families in Bar, Montenegro.';
+    ? 'NU Lea Bar - podrška ženama, djevojkama i porodicama u Baru.'
+    : 'NU Lea Bar - support for women, girls and families in Bar, Montenegro.';
+
+const impactStats = {
+  me: [
+    {
+      num: '1 od 3',
+      text: 'žene dožive neki oblik nasilja od strane emotivnog partnera',
+      src: '',
+    },
+    {
+      num: '8 godina',
+      text: 'prosječno vrijeme potrebno da žena skupi snagu da prijavi nasilje',
+      src: '',
+    },
+    {
+      num: '60 %',
+      text: 'ubistava žena počini partner ili član porodice',
+      src: '',
+    },
+    {
+      num: '50 %+',
+      text: 'žena koje su doživjele nasilje nije nikada potražilo pomoć',
+      src: '',
+    },
+  ],
+  en: [
+    {
+      num: '1 in 3',
+      text: 'women experience some form of violence at the hands of an intimate partner',
+      src: '',
+    },
+    {
+      num: '8 years',
+      text: 'is the average time it takes a woman to gather the strength to report violence',
+      src: '',
+    },
+    {
+      num: '60%',
+      text: 'of murders of women are committed by a partner or a family member',
+      src: '',
+    },
+    {
+      num: '50%+',
+      text: 'of women who have experienced violence have never sought help',
+      src: '',
+    },
+  ],
+};
+
+const rightProjects = projects.filter((_, i) => i % 2 === 0);
+const leftProjects = projects.filter((_, i) => i % 2 === 1);
+
+const heroWords = (
+  lang === 'me' ? 'Podrška, prevencija, osnaživanje' : 'Support, prevention, empowerment'
+).split(' ');
 ---
 
 <BaseLayout lang={lang} title={title} description={description}>
   <div class="hero">
     <div class="wrap hero-grid">
-      <div data-reveal>
-        <div class="eyebrow">{lang === 'me' ? 'Bar, Crna Gora' : 'Bar, Montenegro'}</div>
-        <h1>{lang === 'me' ? 'Podrška ženama, djevojkama i porodicama.' : 'Support for women, girls and families.'}</h1>
-        <p class="lead">
+      <div>
+        <h1 class="blur-text">
+          {heroWords.map((w, i) => (
+            <Fragment>{i > 0 && ' '}<span class="bw" style={`--bw-delay:${i * 200}ms`}>{w}</span></Fragment>
+          ))}
+        </h1>
+        <div class="stat-row" data-reveal style="--reveal-delay:250ms">
+          <div class="stat-inline">
+            <b><span data-count="100">100</span>&nbsp;%</b>
+            <span>{lang === 'me' ? 'povjerljivo' : 'confidential'}</span>
+          </div>
+          <div class="stat-inline">
+            <b><span data-count="24">24</span>/7</b>
+            <span>{lang === 'me' ? 'dežurna linija' : 'helpline'}</span>
+          </div>
+          <div class="stat-inline">
+            <b><span data-count="100">100</span>&nbsp;%</b>
+            <span>{lang === 'me' ? 'feministički pristup' : 'feminist approach'}</span>
+          </div>
+        </div>
+        <p class="lead" data-reveal style="--reveal-delay:350ms">
           {lang === 'me'
-            ? 'Radimo na prevenciji nasilja, osnaživanju djevojaka i podršci roditeljima. Sve naše usluge su besplatne, a sve što nam kažete ostaje povjerljivo.'
-            : 'We work on violence prevention, empowering girls and supporting parents. All our services are free, and everything you tell us stays confidential.'}
+            ? 'NU Lea Bar je ženska organizacija posvećena zaštiti ljudskih prava, sa posebnim fokusom na zaštitu i osnaživanje žena i djece žrtava rodno zasnovanog i porodičnog nasilja.'
+            : 'NU Lea Bar is a women\'s organisation dedicated to protecting human rights, with a special focus on protecting and empowering women and children affected by gender-based and domestic violence.'}
         </p>
-        <div class="cta-row">
+        <div class="cta-row" data-reveal style="--reveal-delay:450ms">
           <a class="btn btn-primary" href={localizePath('/kontakt/', lang)}>
-            {lang === 'me' ? 'Treba mi podrška' : 'I need support'}
+            {lang === 'me' ? 'Kontakt' : 'Contact'}
           </a>
           <a class="btn btn-ghost" href={localizePath('/projekti/', lang)}>
-            {t(lang, 'nav_projects')}
+            {lang === 'me' ? 'Naš rad' : 'Our work'}
+          </a>
+          <a class="btn-link" href={localizePath('/doniraj/', lang)}>
+            {lang === 'me' ? 'Doniraj →' : 'Donate →'}
           </a>
         </div>
       </div>
-      <div class="stat-stack" data-reveal style="--reveal-delay:150ms">
-        <div class="stat"><b>24/7</b><span>{lang === 'me' ? 'SOS linija, svakog dana u godini' : 'SOS line, every day of the year'}</span></div>
-        <div class="stat"><b>0 &euro;</b><span>{lang === 'me' ? 'Sve usluge su besplatne' : 'All services are free of charge'}</span></div>
-        <div class="stat"><b>{lang === 'me' ? 'Povjerljivo' : 'Confidential'}</b><span>{lang === 'me' ? 'Bez prijave i bez uslova' : 'No registration, no conditions'}</span></div>
-      </div>
-    </div>
-    <div class="wrap">
-      <!--
-        Prostor za pravu fotografiju (npr. sa radionice), sa suptilnim
-        Ken Burns zumom. Dok fajl ne postoji na /assets/hero.jpg, panel
-        se tiho uklanja (onerror) — ne prikazuje se slomljena slika.
-        Kad dodaš fotografiju, upiši i pravi opisni alt tekst ispod.
-      -->
-      <div class="hero-photo" data-reveal style="--reveal-delay:220ms">
-        <img src="/assets/hero.jpg" alt="" loading="eager" onerror="this.closest('.hero-photo').remove()" />
+      <div class="hero-visual" data-reveal style="--reveal-delay:200ms">
+        <img
+          src="/assets/heroSlika.svg"
+          alt={lang === 'me'
+            ? 'Kolaž fotografija sa aktivnosti udruženja Lea Bar'
+            : 'Photo collage from Lea Bar activities'}
+          loading="eager"
+          width="1080"
+          height="842"
+        />
       </div>
     </div>
   </div>
 
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec-head" data-reveal><h2>{t(lang, 'what_we_do')}</h2></div>
-      <div class="prog-grid">
-        <div class="prog" data-reveal>
-          <h3>{lang === 'me' ? 'Podrška ženama i djeci' : 'Support for women and children'}</h3>
-          <p>
-            {lang === 'me'
-              ? 'Savjetovanje, pratnja kroz institucije i povezivanje sa uslugama sigurnog smještaja.'
-              : 'Counselling, accompaniment through institutions and referral to safe accommodation services.'}
-          </p>
+  <section class="trail-zone" id="trail-zone">
+    <div class="trail-stage">
+      <div class="trail-frame" id="trail-frame">
+        <video
+          class="trail-video"
+          src="/assets/trail-bg.mp4"
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          data-ambient
+          aria-hidden="true"
+        ></video>
+        <div class="trail-scrim" aria-hidden="true"></div>
+        <ImageTrail
+          images={[
+            '/assets/trail/1.webp',
+            '/assets/trail/2.webp',
+            '/assets/trail/3.webp',
+            '/assets/trail/4.webp',
+            '/assets/trail/5.webp',
+            '/assets/trail/6.webp',
+            '/assets/trail/7.webp',
+            '/assets/trail/8.webp',
+          ]}
+        />
+      </div>
+      <div class="trail-sec-inner">
+        <h2 class="trail-sec-title">
+          {lang === 'me' ? 'Zajednica koju gradimo' : 'The community we build'}
+        </h2>
+        <p class="trail-sec-hint">
+          <span class="trail-hint-mouse">
+            {lang === 'me' ? 'Pređi kursorom preko ove sekcije' : 'Move your cursor across this section'}
+          </span>
+          <span class="trail-hint-touch">
+            {lang === 'me' ? 'Pređi prstom preko ove sekcije' : 'Swipe across this section'}
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="feminist-sec">
+    <div class="feminist-visual" aria-hidden="true">
+      <div class="feminist-words">
+        <div class="fw-list">
+          {(lang === 'me'
+            ? ['Prepoznaj', 'Osnaži', 'Podrži', 'Reaguj', 'Promijeni']
+            : ['Recognise', 'Empower', 'Support', 'React', 'Change']
+          ).map((w, i) => (
+            <span class="fw" style={`--fw-i:${i}`}>{w}</span>
+          ))}
         </div>
-        <div class="prog" data-reveal style="--reveal-delay:90ms">
-          <h3>{lang === 'me' ? 'Osnaživanje djevojaka' : 'Empowering girls'}</h3>
-          <p>
-            {lang === 'me'
-              ? 'Vršnjačka edukacija o rodnoj ravnopravnosti, prepoznavanju nasilja i pravima djevojaka.'
-              : 'Peer education on gender equality, recognising violence and the rights of girls.'}
-          </p>
-        </div>
-        <div class="prog" data-reveal style="--reveal-delay:180ms">
-          <h3>{lang === 'me' ? 'Rad sa roditeljima' : 'Working with parents'}</h3>
-          <p>
-            {lang === 'me'
-              ? 'Otvorena predavanja o prevenciji rizičnog ponašanja i podršci adolescentima.'
-              : 'Open lectures on preventing risk behaviour and supporting adolescents.'}
-          </p>
+      </div>
+    </div>
+    <div class="wrap feminist-content-wrap">
+      <div class="feminist-content" data-reveal>
+        <h2>{lang === 'me' ? 'Mala sredina. Glasan otpor.' : 'A small community. A loud response.'}</h2>
+        <p>
+          {lang === 'me'
+            ? 'Iz male sredine pokrećemo velike promjene - glasno govorimo protiv nasilja i borimo se za pravo svake žene i svakog djeteta za sigurnost, dostojanstvo i život bez nasilja.'
+            : 'From a small community we spark big changes - we speak out loudly against violence and fight for the right of every woman and every child to safety, dignity and a life free from violence.'}
+        </p>
+        <p class="feminist-highlight">
+          {lang === 'me'
+            ? 'Naš glas je glas žena koje su preživjele nasilje, a naš otpor je odlučan: nasilje nije privatna stvar, već društveni problem na koji svi moramo odgovoriti!'
+            : 'Our voice is the voice of women who have survived violence, and our resistance is resolute: violence is not a private matter but a social problem we must all respond to!'}
+        </p>
+        <a class="btn btn-outline-light" href={localizePath('/doniraj/', lang)}>
+          {lang === 'me' ? 'Podrži naš rad →' : 'Support our work →'}
+        </a>
+        <div class="stat-cards" id="stat-cards">
+          {impactStats[lang].map((s) => {
+            const m = s.num.match(/^(\d+)(.*)$/);
+            return (
+              <div class="stat-card">
+                <b>{m ? <Fragment><span data-count={m[1]}>{m[1]}</span>{m[2]}</Fragment> : s.num}</b>
+                <p>{s.text}</p>
+                {s.src && <span>{s.src}</span>}
+              </div>
+            );
+          })}
+          <div class="chroma-veil" aria-hidden="true"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="sec sec-alt">
+  <script>
+    /* Širenje trail sekcije skrolom — isti mehanizam kao kadar na
+       "O nama": napredak kroz sticky zonu otvara clip-path kadra iz
+       male kutije do pune širine. Bez JS-a / uz smanjeno kretanje
+       sekcija je statična traka — aktivni režim uključuje tek .ts-on. */
+    const tZone = document.getElementById('trail-zone');
+    const tFrame = document.getElementById('trail-frame');
+    if (tZone && tFrame && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      tZone.classList.add('ts-on');
+
+      const clampN = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
+      const smooth = (x: number) => {
+        const t = clampN(x, 0, 1);
+        return t * t * (3 - 2 * t);
+      };
+
+      const START_W = 42, START_H = 58, START_R = 24, DIST = 1;
+      let cur = 0, tgt = 0, raf = 0;
+
+      const apply = (p: number) => {
+        const e = smooth(p);
+        const w = START_W + (100 - START_W) * e;
+        const h = START_H + (100 - START_H) * e;
+        const ix = Math.max(0, (100 - w) / 2);
+        const iy = Math.max(0, (100 - h) / 2);
+        tFrame!.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${START_R * (1 - e)}px)`;
+      };
+
+      const read = () => clampN(-tZone!.getBoundingClientRect().top / (window.innerHeight * DIST), 0, 1);
+      const k = 1 - Math.exp(-1 / (60 * 0.1));
+      const tick = () => {
+        cur += (tgt - cur) * k;
+        if (Math.abs(tgt - cur) < 0.0004) {
+          cur = tgt;
+          raf = 0;
+        } else {
+          raf = requestAnimationFrame(tick);
+        }
+        apply(cur);
+      };
+      const onTrailScroll = () => {
+        tgt = read();
+        if (!raf) raf = requestAnimationFrame(tick);
+      };
+
+      window.addEventListener('scroll', onTrailScroll, { passive: true });
+      window.addEventListener('resize', onTrailScroll);
+      cur = tgt = read();
+      apply(cur);
+    }
+
+    /* Roller riječi prati kursor: vertikalna pozicija miša preko sekcije
+       mapira se na poziciju u listi (0–4), a lerp je glatko sustiže.
+       Aktivno samo uz pravi kursor i bez smanjenog kretanja — inače
+       ostaje CSS petlja (fallback bez JS-a). */
+    const fwWrap = document.querySelector('.feminist-words') as HTMLElement | null;
+    const fwSec = document.querySelector('.feminist-sec') as HTMLElement | null;
+    if (fwWrap && fwSec && window.matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches) {
+      const fwList = fwWrap.querySelector('.fw-list') as HTMLElement;
+      const fwWords = Array.from(fwWrap.querySelectorAll('.fw')) as HTMLElement[];
+      fwWrap.classList.add('fw-manual');
+
+      let fwPos = 2, fwTgt = 2, fwRaf = 0;
+      const fwApply = () => {
+        fwList.style.transform = `translateY(calc(-50% - ${fwPos - 2} * var(--fw-lh)))`;
+        fwWords.forEach((w, i) => {
+          const ds = Math.max(-2.5, Math.min(2.5, i - fwPos)); /* sa predznakom */
+          const d = Math.abs(ds);
+          /* polukrug: dalje riječi bježe ulijevo (kvadratno), aktivna je
+             najisturenija udesno; rotacija prati tangentu luka */
+          const arcX = (-(ds * ds) * 18).toFixed(1);
+          const arcRot = (ds * 7).toFixed(2);
+          const arcScale = (1 - Math.min(0.12, d * 0.06)).toFixed(3);
+          w.style.transform = `translateX(${arcX}px) rotate(${arcRot}deg) scale(${arcScale})`;
+          w.style.filter = `blur(${Math.min(6, d * 5).toFixed(2)}px)`;
+          w.style.opacity = String(Math.max(0.45, 1 - d * 0.55).toFixed(3));
+          w.style.setProperty('--fw-on', String(Math.max(0, 1 - d * 2).toFixed(3)));
+        });
+      };
+      const fwTick = () => {
+        fwPos += (fwTgt - fwPos) * 0.09;
+        if (Math.abs(fwTgt - fwPos) < 0.002) {
+          fwPos = fwTgt;
+          fwRaf = 0;
+        } else {
+          fwRaf = requestAnimationFrame(fwTick);
+        }
+        fwApply();
+      };
+      fwSec.addEventListener('pointermove', (e) => {
+        const r = fwSec.getBoundingClientRect();
+        const t = (e.clientY - r.top) / r.height;
+        /* rub sekcije (15% gore/dolje) drži prvu/zadnju riječ — fokus ne "bježi" na ivicama */
+        fwTgt = Math.min(4, Math.max(0, ((t - 0.15) / 0.7) * 4));
+        if (!fwRaf) fwRaf = requestAnimationFrame(fwTick);
+      });
+      fwApply();
+    }
+
+    /* "Chroma" efekat na statističkim karticama: reflektor prati kursor,
+       veo prigušuje ostatak mreže. Radi samo uz pravi kursor i kad korisnik
+       nije tražio smanjeno kretanje — na dodirnim uređajima je neaktivan. */
+    const grid = document.getElementById('stat-cards');
+    const chromaOk = window.matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)');
+    if (grid && chromaOk.matches) {
+      const cards = Array.from(grid.querySelectorAll('.stat-card')) as HTMLElement[];
+      let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
+
+      function apply() {
+        grid!.style.setProperty('--cx', `${x}px`);
+        grid!.style.setProperty('--cy', `${y}px`);
+      }
+      function tick() {
+        x += (tx - x) * 0.12;
+        y += (ty - y) * 0.12;
+        apply();
+        raf = Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5 ? requestAnimationFrame(tick) : 0;
+      }
+
+      grid.addEventListener('pointerenter', (e) => {
+        const r = grid!.getBoundingClientRect();
+        x = tx = e.clientX - r.left;
+        y = ty = e.clientY - r.top;
+        apply();
+      });
+      grid.addEventListener('pointermove', (e) => {
+        const r = grid!.getBoundingClientRect();
+        tx = e.clientX - r.left;
+        ty = e.clientY - r.top;
+        if (!raf) raf = requestAnimationFrame(tick);
+        grid!.classList.add('chroma-on');
+        for (const card of cards) {
+          const cr = card.getBoundingClientRect();
+          card.style.setProperty('--mx', `${e.clientX - cr.left}px`);
+          card.style.setProperty('--my', `${e.clientY - cr.top}px`);
+        }
+      });
+      grid.addEventListener('pointerleave', () => grid!.classList.remove('chroma-on'));
+    }
+
+    /* Brojanje od nule kad broj uđe u vidno polje. U HTML-u stoji puna
+       vrijednost, pa je bez JS-a i uz smanjeno kretanje broj odmah tačan. */
+    /* samo span-ovi sa brojem — širi [data-count] bi zahvatio i tuđe
+       kontejnere sa istim atributom i textContent bi im obrisao djecu */
+    const counters = Array.from(document.querySelectorAll('span[data-count]')) as HTMLElement[];
+    if (counters.length && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          io.unobserve(entry.target);
+          const el = entry.target as HTMLElement;
+          const to = parseInt(el.dataset.count ?? '0', 10);
+          const start = performance.now();
+          const step = (now: number) => {
+            const t = Math.min((now - start) / 2000, 1);
+            el.textContent = String(Math.round(to * (1 - Math.pow(1 - t, 3))));
+            if (t < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      });
+      counters.forEach((el) => io.observe(el));
+    }
+  </script>
+
+  <section class="wcs">
     <div class="wrap">
-      <div class="sec-head" data-reveal>
+      <div class="wcs-grid">
+        <div class="wcs-left">
+          <div class="wcs-head" data-reveal>
+            <h2>{t(lang, 'what_we_do')}</h2>
+            <p>
+              {lang === 'me'
+                ? 'Kroz edukativne aktivnosti, javne kampanje i saradnju sa institucijama i lokalnom zajednicom, udruženje NU LEA aktivno doprinosi stvaranju sigurnijeg i pravednijeg društva. Istovremeno, kontinuirano radimo na podizanju svijesti u društvu o značaju prevencije nasilja, zaštiti ljudskih prava i unapređenju rodne ravnopravnosti.'
+                : 'Through educational activities, public campaigns and cooperation with institutions and the local community, the NU LEA association actively contributes to building a safer and more just society. At the same time, we work continuously on raising public awareness of the importance of preventing violence, protecting human rights and advancing gender equality.'}
+            </p>
+          </div>
+
+          <div class="wcs-row">
+            <div class="wcs-item" data-reveal>
+              <div class="wcs-icon" aria-hidden="true">
+                <img src="/assets/womens-day.png" alt="" loading="lazy" width="64" height="64" />
+              </div>
+              <h3>{lang === 'me' ? 'Podrška ženama i djeci' : 'Support for women and children'}</h3>
+              <p>
+                {lang === 'me'
+                  ? 'Pružamo besplatnu specijalizovanu uslugu smještaja / skloništa za žene i djecu žrtve nasilja, besplatnu psihosocijalnu podršku, pravno savjetovanje i upućivanje.'
+                  : 'We provide a free specialised shelter and accommodation service for women and children who are victims of violence, free psychosocial support, legal counselling and referrals.'}
+              </p>
+            </div>
+
+            <div class="wcs-op" aria-hidden="true">+</div>
+
+            <div class="wcs-item" data-reveal style="--reveal-delay:90ms">
+              <div class="wcs-icon" aria-hidden="true">
+                <img src="/assets/womens-power.png" alt="" loading="lazy" width="64" height="64" />
+              </div>
+              <h3>{lang === 'me' ? 'Osnaživanje žrtava' : 'Empowering survivors'}</h3>
+              <p>
+                {lang === 'me'
+                  ? 'Na putu ka izlasku iz začaranog kruga nasilja i izgradnji samostalnog i dostojanstvenog života; pružanje usluge povjerljivog lica.'
+                  : 'On the path out of the vicious cycle of violence and towards building an independent and dignified life; providing the service of a person of trust.'}
+              </p>
+            </div>
+
+            <div class="wcs-op" aria-hidden="true">+</div>
+
+            <div class="wcs-item" data-reveal style="--reveal-delay:180ms">
+              <div class="wcs-icon" aria-hidden="true">
+                <img src="/assets/care.png" alt="" loading="lazy" width="64" height="64" />
+              </div>
+              <h3>{lang === 'me' ? 'Rad sa zajednicom' : 'Working with the community'}</h3>
+              <p>
+                {lang === 'me'
+                  ? 'Kroz edukacije i obuke o prepoznavanju i reagovanju u slučajevima nasilja podižemo svijest u zajednici.'
+                  : 'Through education and training on recognising and responding to violence, we raise awareness in the community.'}
+              </p>
+            </div>
+
+            <div class="wcs-op wcs-op-eq" aria-hidden="true">=</div>
+          </div>
+        </div>
+
+        <div class="wcs-result-wrap" data-reveal style="--reveal-delay:260ms">
+          <div class="wcs-photo">
+            <video
+              src="/assets/sesira_background_loop_1610x1080.mp4"
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              data-ambient
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="wcs-result">
+            <h3>{lang === 'me' ? 'Zajednica bez nasilja' : 'A community free of violence'}</h3>
+            <p>
+              {lang === 'me'
+                ? 'Gradimo kulturu nenasilja, poštovanja i sigurnosti za sve. Prijavi nasilje. Nisi sama — tu smo da te čujemo, podržimo i zaštitimo.'
+                : 'We build a culture of non-violence, respect and safety for all. Report violence. You are not alone — we are here to hear you, support you and protect you.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FeaturedNewsCarousel lang={lang} news={featuredNews} />
+
+  <section class="proj-dark">
+    <div class="wrap proj-dark-grid">
+      <div class="proj-col proj-col-left">
+        <h2 class="proj-dark-title" data-reveal>{t(lang, 'projects_heading')}</h2>
+        <p class="proj-dark-intro" data-reveal>{t(lang, 'projects_intro')}</p>
+
+        {leftProjects.length > 0 && (
+          <div class="proj-col-stack">
+            {leftProjects.map((project, i) => (
+              <ProjectBlock lang={lang} project={project} index={i} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {rightProjects.length > 0 && (
+        <div class="proj-col proj-col-right">
+          <div class="proj-col-stack">
+            {rightProjects.map((project, i) => (
+              <ProjectBlock lang={lang} project={project} index={i} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {projects.length === 0 && (
+        <p class="proj-dark-empty">{t(lang, 'no_projects_yet')}</p>
+      )}
+    </div>
+
+    {projects.length > 0 && (
+      <div class="wrap">
+        <div class="proj-dark-cta">
+          <a class="pblock-btn pblock-btn-cta" href={localizePath('/projekti/', lang)}>
+            {t(lang, 'all_projects')}
+          </a>
+        </div>
+      </div>
+    )}
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head news-sec-head" data-reveal>
         <h2>{t(lang, 'news_heading')}</h2>
         <a href={localizePath('/vijesti/', lang)}>{t(lang, 'all_news')}</a>
       </div>
       {news.length > 0 ? (
-        <div class="news-grid">
-          {news.map((item, i) => <NewsCard lang={lang} news={item} index={i} />)}
-        </div>
+        <>
+          <div class="news-grid">
+            {news.map((item, i) => <NewsCard lang={lang} news={item} index={i} />)}
+          </div>
+          <div class="news-more">
+            <a class="btn-outline" href={localizePath('/vijesti/', lang)}>{t(lang, 'load_more_news')}</a>
+          </div>
+        </>
       ) : (
         <p class="empty-note">{t(lang, 'no_news_yet')}</p>
-      )}
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec-head" data-reveal>
-        <h2>{t(lang, 'current_projects_heading')}</h2>
-        <a href={localizePath('/projekti/', lang)}>{t(lang, 'all_projects')}</a>
-      </div>
-      {projects.length > 0 ? (
-        <div class="proj-list">
-          {projects.map((project, i) => <ProjectRow lang={lang} project={project} index={i} />)}
-        </div>
-      ) : (
-        <p class="empty-note">{t(lang, 'no_projects_yet')}</p>
       )}
     </div>
   </section>

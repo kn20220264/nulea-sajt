@@ -1,26 +1,39 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectRow from '../ProjectRow.astro';
+import ProjectCard from '../ProjectCard.astro';
 import { t } from '../../lib/i18n.js';
-import { getActiveProjects, getArchivedProjects } from '../../lib/queries.js';
+import { getAllProjects } from '../../lib/queries.js';
 
 const { lang } = Astro.props;
-const [active, archived] = await Promise.all([getActiveProjects(), getArchivedProjects()]);
+const projects = await getAllProjects();
 ---
 
 <BaseLayout lang={lang} title={t(lang, 'projects_page_title')} description={t(lang, 'projects_page_lead')}>
   <div class="page-head">
-    <div class="wrap" data-reveal>
-      <h1>{t(lang, 'projects_page_title')}</h1>
-      <p>{t(lang, 'projects_page_lead')}</p>
+    <div class="wrap">
+      <div class="page-head-row" data-reveal>
+        <div>
+          <h1>{t(lang, 'projects_page_title')}</h1>
+          <span class="page-head-kicker" aria-hidden="true"></span>
+        </div>
+        <p class="page-head-lead">{t(lang, 'projects_page_lead')}</p>
+      </div>
+      <div class="proj-filter" data-reveal>
+        <span class="proj-filter-label" id="proj-filter-label">{t(lang, 'projects_filter_label')}</span>
+        <div class="proj-filter-group" role="group" aria-labelledby="proj-filter-label">
+          <button type="button" class="proj-filter-btn" data-filter="all" aria-pressed="true">{t(lang, 'projects_filter_all')}</button>
+          <button type="button" class="proj-filter-btn" data-filter="active" aria-pressed="false">{t(lang, 'projects_filter_ongoing')}</button>
+          <button type="button" class="proj-filter-btn" data-filter="done" aria-pressed="false">{t(lang, 'projects_filter_completed')}</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <section class="sec">
     <div class="wrap">
-      {active.length > 0 ? (
-        <div class="proj-list">
-          {active.map((project, i) => <ProjectRow lang={lang} project={project} index={i} />)}
+      {projects.length > 0 ? (
+        <div class="proj-grid" id="proj-grid">
+          {projects.map((project, i) => <ProjectCard lang={lang} project={project} index={i} />)}
         </div>
       ) : (
         <p class="empty-note">{t(lang, 'no_projects_yet')}</p>
@@ -28,16 +41,21 @@ const [active, archived] = await Promise.all([getActiveProjects(), getArchivedPr
     </div>
   </section>
 
-  <section class="sec sec-alt">
-    <div class="wrap">
-      <div class="sec-head" data-reveal><h2>{t(lang, 'archive_heading')}</h2></div>
-      {archived.length > 0 ? (
-        <div class="proj-list">
-          {archived.map((project, i) => <ProjectRow lang={lang} project={project} index={i} />)}
-        </div>
-      ) : (
-        <p class="empty-note">{t(lang, 'no_archive_yet')}</p>
-      )}
-    </div>
-  </section>
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.proj-filter-btn');
+    const cards = document.querySelectorAll('#proj-grid [data-status]');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        const value = btn.dataset.filter;
+        cards.forEach((card) => {
+          const status = card.getAttribute('data-status');
+          const show =
+            value === 'all' ||
+            (value === 'active' ? status === 'active' || status === 'planned' : status === value);
+          card.toggleAttribute('hidden', !show);
+        });
+      });
+    });
+  </script>
 </BaseLayout>
