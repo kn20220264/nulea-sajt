@@ -129,8 +129,14 @@ export const CATEGORY_LABELS = {
   radionica: { me: 'Radionica', en: 'Workshop' },
   obuka: { me: 'Obuka', en: 'Training' },
   predavanje: { me: 'Predavanje', en: 'Lecture' },
-  saopstenje: { me: 'Saopštenje', en: 'Statement' },
-  izvjestaj: { me: 'Izvještaj', en: 'Report' },
+  // preimenovano u Studiju: "Saopštenje" -> "Medijsko predstavljanje",
+  // "Izvještaj" -> "Ostalo". Sačuvane vrijednosti u starim dokumentima su i
+  // dalje `saopstenje`/`izvjestaj`, pa oba ključa (stari i novi) vode na isti
+  // natpis — radi bez migracije podataka.
+  saopstenje: { me: 'Medijsko predstavljanje', en: 'Media appearance' },
+  'medijsko-predstavljanje': { me: 'Medijsko predstavljanje', en: 'Media appearance' },
+  izvjestaj: { me: 'Ostalo', en: 'Other' },
+  ostalo: { me: 'Ostalo', en: 'Other' },
   projekat: { me: 'Projekat', en: 'Project' },
   konferencija: { me: 'Konferencija', en: 'Conference' },
   akcija: { me: 'Akcija', en: 'Campaign' },

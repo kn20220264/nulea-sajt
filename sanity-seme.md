@@ -34,7 +34,7 @@ export default {
 |---|---|---|
 | `title` | localeString | naslov (`title.me` / `title.en`) |
 | `slug` | slug | generiše se iz crnogorskog naslova (`title.me`) |
-| `category` | string (lista) | `radionica`, `obuka`, `predavanje`, `saopstenje`, `izvjestaj`, `projekat`, `konferencija`, `akcija` |
+| `category` | string (lista) | `radionica`, `obuka`, `predavanje`, `saopstenje` (natpis: „Medijsko predstavljanje“), `izvjestaj` (natpis: „Ostalo“), `projekat`, `konferencija`, `akcija` — frontend prihvata i nove vrijednosti `medijsko-predstavljanje` / `ostalo` |
 | `publishedAt` | datetime | može se unijeti unazad |
 | `excerpt` | localeText | sažetak za listu, max **220** znakova |
 | `coverImage` | image | `options: {hotspot: true}` + `altMe`/`altEn` (obavezni, lokalizovani alt) |
