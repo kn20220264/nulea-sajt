@@ -667,14 +667,27 @@ a.pub-row:hover .pub-arrow{border-color:var(--c-magenta);color:var(--c-magenta);
 .pblock-btn-cta{width:auto;padding:0 40px}
 
 @media(max-width:900px){
-  .proj-dark-grid{grid-template-columns:1fr}
-  .proj-col-left .proj-col-stack{margin-top:0}
-  .proj-dark-empty{grid-column:1;margin-top:48px}
-  .proj-dark-title{font-size:36px}
+  /* jedna kolona: kolone se "raspadaju" u glavni tok da bi projekti
+     ostali u pravom redoslijedu (0,1,2...) i dobili razmak izmedju sebe */
+  .proj-dark-grid{display:flex;flex-direction:column;gap:0}
+  .proj-col{display:contents}
+  .proj-dark-title{order:1;font-size:36px;max-width:none}
+  .proj-dark-intro{order:2;width:100%}
+  .proj-col-right .proj-col-stack{order:3}
+  .proj-col-left .proj-col-stack{order:4}
+  .proj-col-stack{gap:56px;margin-top:56px}
+  .proj-col-left .proj-col-stack{margin-top:56px}
+  .proj-dark-empty{margin-top:48px;min-height:0}
+  .proj-dark-cta{margin-top:56px;justify-content:flex-start}
 }
 @media(max-width:520px){
   .proj-dark{padding:72px 0}
   .proj-dark-title{font-size:30px;max-width:none}
+  .proj-col-stack,.proj-col-left .proj-col-stack{gap:48px;margin-top:48px}
+  .pblock h3{font-size:26px}
+  .pblock p{margin-top:12px}
+  .pblock-img{margin-top:20px}
+  .pblock-btn-cta{width:100%;justify-content:center;padding:0 24px}
 }
 
 /* ---------- O NAMA ----------
@@ -926,7 +939,11 @@ a.pub-row:hover .pub-arrow{border-color:var(--c-magenta);color:var(--c-magenta);
   .ab-hero-visual{max-width:440px;margin:0 auto;width:100%}
   .ab-split{grid-template-columns:1fr}
   .ab-split-left{padding:3.5rem 1.5rem}
-  .ab-split-right{min-height:60vh}
+  /* Na užim ekranima panel prelazi iz apsolutnog sloja u običan tok:
+     GLASAN OTPOR gore, logo ispod — bez preklapanja. */
+  .ab-split-right{min-height:0;padding:3.5rem 1.5rem 3rem;display:flex;flex-direction:column;align-items:center;gap:2.5rem}
+  .ab-bigword{position:static;width:100%;text-align:center}
+  .ab-panel-photo{position:static;left:auto;bottom:auto;transform:none}
 }
 @media(max-width:640px){
   .ab-values-grid{grid-template-columns:1fr}
@@ -1169,6 +1186,11 @@ html.nav-open-lock{overflow:hidden}
 }
 @media(max-width:560px){
   .sos-note{display:none}
+  /* Hero statistike na telefonu: svaka u svom redu, broj i opis jedno uz
+     drugo — bez lomljenja "na koso" kad treći podatak pređe u novi red. */
+  .stat-row{flex-direction:column;gap:10px}
+  .stat-inline{display:flex;align-items:baseline;gap:10px;padding:0;border-left:0}
+  .stat-inline b{font-size:22px}
   .proj-grid{grid-template-columns:1fr;gap:48px}
   .stat-cards{grid-template-columns:1fr}
   .quick-exit-fab{right:16px;bottom:16px;height:40px;padding:0 13px;font-size:13px}
